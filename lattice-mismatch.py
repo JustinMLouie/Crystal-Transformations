@@ -26,16 +26,16 @@ def calculateAreaRatio(lattice1, lattice2):
 # -------------------------------------------------------------------------------
 
 def rationalizeRatio(ratio, N):
+	"""
+	STEP 2
+	Calculates a set of numbers that form a rational number with a ratio
+	Equation 2.2 of Lattice Match: An Application to heteroepitaxy
+	Example shown in equation 3.1
+	Taken from # https://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
 
-	# STEP 2
-	# Calculates a set of numbers that form a rational number with a ratio
-	# Equation 2.2 of Lattice Match: An Application to heteroepitaxy
-	# Example shown in equation 3.1
-	# Taken from # https://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
-
-	# Intakes number 0 < x < 1
-	# Maximum denominator = N
-
+	Intakes number 0 < x < 1
+	Maximum denominator = N
+	"""
 
 	a = 0
 	b = 1
