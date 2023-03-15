@@ -26,45 +26,45 @@ def calculateAreaRatio(lattice1, lattice2):
 # -------------------------------------------------------------------------------
 
 def rationalizeRatio(ratio, N):
-	"""
-	STEP 2
-	Calculates a set of numbers that form a rational number with a ratio
-	Equation 2.2 of Lattice Match: An Application to heteroepitaxy
-	Example shown in equation 3.1
-	Taken from # https://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
 
-	Intakes number 0 < x < 1
-	Maximum denominator = N
+	# STEP 2
+	# Calculates a set of numbers that form a rational number with a ratio
+	# Equation 2.2 of Lattice Match: An Application to heteroepitaxy
+	# Example shown in equation 3.1
+	# Taken from # https://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
 
-	
-	"""
+	# Intakes number 0 < x < 1
+	# Maximum denominator = N
+
+
+	a = 0
+	b = 1
+	c = 1
+	d = 1
 
 	# Flip ratio if it is greater than 1 to fit rationalizeRatio
 	if(ratio > 1):
 		ratio = 1 /ratio
 
-    a, b = 0, 1
-    c, d = 1, 1
-    while (b <= N and d <= N):
-        mediant = float(a+c)/(b+d)
+	while (b <= N and d <= N):
+		mediant = float(a+c)/(b+d)
+		# checks if it is within the 1% accepted error
+		if (abs(ratio - mediant)/ratio <= 0.01):
+			if b + d <= N:
+				return a+c, b+d
+			elif d > b:
+				return c, d
+			else:
+				return a, b
+		elif ratio > mediant:
+			a, b = a+c, b+d
+		else:
+			c, d = a+c, b+d
 
-        # checks if it is within the 1% accepted error
-        if (abs(ratio - mediant)/ratio <= 0.01):
-            if b + d <= N:
-                return a+c, b+d
-            elif d > b:
-                return c, d
-            else:
-                return a, b
-        elif ratio > mediant:
-            a, b = a+c, b+d
-        else:
-            c, d = a+c, b+d
-
-    if (b > N):
-        return c, d
-    else:
-        return a, b
+	if (b > N):
+		return c, d
+	else:
+		return a, b
 
 # -------------------------------------------------------------------------------
 
@@ -157,16 +157,29 @@ def lattice_transformations(lattice1, lattice2):
 	
 	# TODO: Figure out which set of the x1 x2 and x3 is the best transformation
 
-#lattice_transformations(np.array([[5.653,0], [0,5.653]]), [6.481,0], [0,6.481])
+#lattice_transformations(np.array([[5.653,0], [0,5.653]], [6.481,0], [0,6.481])
 
 # TODO: test each component as a tiny function (getRational and other mini functions)
-
-
-
 
 # -------------------------------------------------------------------------------
 
 # Unit tests for calculateAreaRatio()
+
+# Test of 1 to 1
+print("Identical Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[1,0], [0,1]])))
+
+
+# Test 9/4 = 5.6025
+print("Testing 9/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9,0], [0,9]])))
+
+# Testing non-integer ratios
+print("Testing 9.1/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9.1,0], [0,9.1]])))
+
+# GaAs: a = 5.653
+# CdTe: a = 6.481
+# Ratio should be 1.314
+print("GaAs and CdTe ratio: " + str(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+
 
 # Unit tests for rationalizeRatio()
 
