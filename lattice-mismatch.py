@@ -9,6 +9,8 @@ def calculateAreaRatio(lattice1, lattice2):
 	Calculates the ratio between the areas of the 2 selected crystals
 	Equation 2.1 of Lattice Match: An Application to heteroepitaxy
 	Example shown in equation 3.1
+
+	Lattice 1 is smaller than Lattice 2
 	"""
 
 	# Lattice 1 area calculations
@@ -44,7 +46,7 @@ def rationalizeRatio(ratio, N):
 
 	# Flip ratio if it is greater than 1 to fit rationalizeRatio
 	if(ratio > 1):
-		ratio = 1 /ratio
+		ratio = 1 / ratio
 
 	while (b <= N and d <= N):
 		mediant = float(a+c)/(b+d)
@@ -68,31 +70,66 @@ def rationalizeRatio(ratio, N):
 
 # -------------------------------------------------------------------------------
 
-# def calculateM():
+def calculateIndividualMVals(lattice1, lattice2, n):
 
 	"""
-	STEP 3
+	STEP 3A
 	Calculates the M matrix that represents the transformations 
 	to get from L1 to L2
 	Equation 2.3 of Lattice Match: An Application to heteroepitaxy
 	Example shown in  3.2 and 3.3
 
-	Intakes number 0 < x < 1
-	Maximum denominator = N
+	Formula: 
+	  L2    =    M      *   L1 - is a square matrix so might be able to take inverse
+	| a2 | = | i j | * | a1 |
+	| b2 |   | 0 m |   | b1 |
+
+	Where: 
+	i * m = n
+	i, m > 0
+	0 <= j <= m - 1
+	n = integer number obtained from rationalizeRatio()
+
+	x1 = i
+	x2 = j
+	x3 = m
+
 	"""
 
-# 	for n in nVals:
-# 		for x1 in range(0,n):
-# 			for x2 in range(0,n):
-# 				for x3 in ramge(0,n):
-# 					if (x1 * x3 == n) and (j <= m - 1):
-# 						m[0,0] = x1
-# 						m[1,0] = x2
-# 						m[1,1] = x3
-# 						if np.dot(transformations,lattice1) == lattice2:
-# 							xVals.append((x1,x2,x3)
+	m = [[0, 0], [0, 0]]
 
-# 	return xVals
+	for x3 in range(0, n + 1):
+		for x1 in range(0, n + 1):
+			for x2 in range(0, n + 1):
+				if ((x1 * x3 == n) and (x2 <= (x3 - 1))):
+					# print("Entered if statement")
+
+					# print("x1 = " + str(x1))
+					# print("x2 = " + str(x2))
+					# print("x3 = " + str(x3))
+
+					m = [[x1, x2], [0, x3]]
+
+					temp = np.dot(m, lattice1)
+
+					if ((np.dot(m, lattice1) == lattice2).all()):
+						return x1, x2, x3
+
+# -------------------------------------------------------------------------------
+
+def calculateAllMVals(lattice1, lattice2, nVals):
+
+	"""
+	STEP 3B
+	Calculates M matrices for all potential N values calculated in rationalizeRatio()
+	"""
+
+	xVals = []
+
+	for ratioPair in nVals:
+		tempM1 = calculateIndividualMVals(lattice1, lattice2, ratioPair[0])
+		tempM1 = calculateIndividualMVals(lattice1, lattice2, ratioPair[2])
+	return xVals
 
 
 # -------------------------------------------------------------------------------
@@ -100,7 +137,6 @@ def rationalizeRatio(ratio, N):
 def lattice_transformations(lattice1, lattice2):
 
 	"""
-
 	Calculates the transformations and re-orientations required to transform from a1, b1 to a2, b2
 
 	a(i) and b(i) are vectors that form 2d lattice of a single crystal
@@ -126,7 +162,6 @@ def lattice_transformations(lattice1, lattice2):
 	M =
 	| x1 x2 |
 	| 0  x3 |
-
 	"""
 
 	# Define the initial and final lattices
@@ -152,7 +187,7 @@ def lattice_transformations(lattice1, lattice2):
 	print("N vals: " + nVals)
 
 	# STEP 3
-	# Calculate the possible M matrices
+	# Calculate the possible M matrices given 
 	
 	
 	# TODO: Figure out which set of the x1 x2 and x3 is the best transformation
@@ -163,27 +198,67 @@ def lattice_transformations(lattice1, lattice2):
 
 # -------------------------------------------------------------------------------
 
-# Unit tests for calculateAreaRatio()
+# # Unit tests for calculateAreaRatio()
+# print("Testing calculateAreaRatio()")
+# print()
 
-# Test of 1 to 1
-print("Identical Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[1,0], [0,1]])))
-
-
-# Test 9/4 = 5.6025
-print("Testing 9/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9,0], [0,9]])))
-
-# Testing non-integer ratios
-print("Testing 9.1/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9.1,0], [0,9.1]])))
-
-# GaAs: a = 5.653
-# CdTe: a = 6.481
-# Ratio should be 1.314
-print("GaAs and CdTe ratio: " + str(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+# # Test of 1 to 1
+# print("Identical Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[1,0], [0,1]])))
 
 
-# Unit tests for rationalizeRatio()
+# # Test 9/4 = 5.6025
+# print("Testing 9/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9,0], [0,9]])))
+
+# # Testing non-integer ratios
+# print("Testing 9.1/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9.1,0], [0,9.1]])))
+
+# # GaAs: a = 5.653
+# # CdTe: a = 6.481
+# # Ratio should be 1.314
+# print("GaAs and CdTe ratio: " + str(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+
+# print("----------------")
+
+# # Unit tests for rationalizeRatio()
+# print("Testing rationalizeRatio()")
+# print()
+
+# # Testing known number ratios
+# print("1/2: " + str(rationalizeRatio(0.500, 1000)))
+# print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
+# print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
+# print("1/4: " + str(rationalizeRatio(0.25, 1000)))
+
+# # TODO: Fix when ratio = 1, algorithm does not have a numerator == denominator
+# print("1/1: " + str(rationalizeRatio(1.000, 1000)))
+
+# print()
+
+# # Testing GaAs and CdTe
+# print("Testing GaAs and CdTe: " + str(rationalizeRatio(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]]), 1000)))
+# print("Testing 1.314: " + str(rationalizeRatio(1.314395525, 1000)))
+# print("Testing 0.760: " + str(rationalizeRatio(0.7608059984, 1000)))
+
+# print()
+
+# # Testing known irrational numbers
+# print("Testing pi: " + str(rationalizeRatio(math.pi , 1000)))
+# print("Testing e:" + str(rationalizeRatio(math.e, 1000)))
+# print("Testing sqrt(2):" + str(rationalizeRatio(math.sqrt(2), 1000)))
+
+# print("----------------")
 
 # Unit tests for calculateM()
+print("Testing calculateM()")
+print()
+
+# Testing Simple calculations 
+print("Testing identical lattices: " + str(calculateIndividualMVals([[1,0], [0,1]], [[1,0], [0,1]], 1)))
+print("Second test: " + str(calculateIndividualMVals([[1,0], [0,1]], [[2,0], [0,1]], 2)))
+print("Inversed test: " + str(calculateIndividualMVals([[1,0], [0,1]], [[1,0], [0,2]], 2)))
+
+
+
 
 
 
