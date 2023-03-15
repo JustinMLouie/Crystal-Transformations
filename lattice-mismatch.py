@@ -44,7 +44,7 @@ def rationalizeRatio(ratio, N):
 
 	# Flip ratio if it is greater than 1 to fit rationalizeRatio
 	if(ratio > 1):
-		ratio = 1 /ratio
+		ratio = 1 / ratio
 
 	while (b <= N and d <= N):
 		mediant = float(a+c)/(b+d)
@@ -100,7 +100,6 @@ def rationalizeRatio(ratio, N):
 def lattice_transformations(lattice1, lattice2):
 
 	"""
-
 	Calculates the transformations and re-orientations required to transform from a1, b1 to a2, b2
 
 	a(i) and b(i) are vectors that form 2d lattice of a single crystal
@@ -126,7 +125,6 @@ def lattice_transformations(lattice1, lattice2):
 	M =
 	| x1 x2 |
 	| 0  x3 |
-
 	"""
 
 	# Define the initial and final lattices
@@ -164,6 +162,8 @@ def lattice_transformations(lattice1, lattice2):
 # -------------------------------------------------------------------------------
 
 # Unit tests for calculateAreaRatio()
+print("Testing calculateAreaRatio()")
+print()
 
 # Test of 1 to 1
 print("Identical Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[1,0], [0,1]])))
@@ -180,8 +180,36 @@ print("Testing 9.1/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9.1,0], [0,9.
 # Ratio should be 1.314
 print("GaAs and CdTe ratio: " + str(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
 
+print("----------------")
 
 # Unit tests for rationalizeRatio()
+print("Testing rationalizeRatio()")
+print()
+
+# Testing known number ratios
+print("1/2: " + str(rationalizeRatio(0.500, 1000)))
+print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
+print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
+print("1/4: " + str(rationalizeRatio(0.25, 1000)))
+
+# TODO: Fix when ratio = 1, algorithm does not have a numerator == denominator
+print("1/1: " + str(rationalizeRatio(1.000, 1000)))
+
+print()
+
+# Testing GaAs and CdTe
+print("Testing GaAs and CdTe: " + str(rationalizeRatio(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]]), 1000)))
+print("Testing 1.314: " + str(rationalizeRatio(1.314395525, 1000)))
+print("Testing 0.760: " + str(rationalizeRatio(0.7608059984, 1000)))
+
+print()
+
+# Testing known irrational numbers
+print("Testing pi: " + str(rationalizeRatio(math.pi , 1000)))
+print("Testing e:" + str(rationalizeRatio(math.e, 1000)))
+print("Testing sqrt(2):" + str(rationalizeRatio(math.sqrt(2), 1000)))
+
+print("----------------")
 
 # Unit tests for calculateM()
 
