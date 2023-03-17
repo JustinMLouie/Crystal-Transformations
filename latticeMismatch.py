@@ -70,11 +70,12 @@ def rationalizeRatio(ratio, N):
 
 # -------------------------------------------------------------------------------
 
-def calculateIndividualMVals(lattice1, lattice2, n):
+# Questions for Chuin Wei
+def calculateIndividualMVals(n):
 
 	"""
 	STEP 3A
-	Calculates the M matrix that represents the transformations 
+	Determines the potential M matrices that represents the transformations 
 	to get from L1 to L2
 	Equation 2.3 of Lattice Match: An Application to heteroepitaxy
 	Example shown in  3.2 and 3.3
@@ -98,22 +99,26 @@ def calculateIndividualMVals(lattice1, lattice2, n):
 
 	m = [[0, 0], [0, 0]]
 
+	solutions = []
+
 	for x3 in range(0, n + 1):
 		for x1 in range(0, n + 1):
 			for x2 in range(0, n + 1):
 				if ((x1 * x3 == n) and (x2 <= (x3 - 1))):
-					# print("Entered if statement")
+					solutions.append([[x1, x2], [0,x3]])
 
 					# print("x1 = " + str(x1))
 					# print("x2 = " + str(x2))
 					# print("x3 = " + str(x3))
 
-					m = [[x1, x2], [0, x3]]
+					# m = [[x1, x2], [0, x3]]
 
-					temp = np.dot(m, lattice1)
+					# temp = np.dot(m, lattice1)
 
-					if ((np.dot(m, lattice1) == lattice2).all()):
-						return x1, x2, x3
+					# if ((np.dot(m, lattice1) == lattice2).all()):
+					# 	return x1, x2, x3
+
+	return solutions
 
 # -------------------------------------------------------------------------------
 
@@ -127,8 +132,13 @@ def calculateAllMVals(lattice1, lattice2, nVals):
 	xVals = []
 
 	for ratioPair in nVals:
-		tempM1 = calculateIndividualMVals(lattice1, lattice2, ratioPair[0])
-		tempM1 = calculateIndividualMVals(lattice1, lattice2, ratioPair[2])
+		solutions1 = calculateIndividualMVals(lattice1, lattice2, ratioPair[0])
+		for sol in solutions1:
+			xVals.append(sol)
+		solutions2 = calculateIndividualMVals(lattice1, lattice2, ratioPair[1])
+		for sol in solutions2:
+			xVals.append(sol)
+
 	return xVals
 
 
@@ -192,9 +202,9 @@ def lattice_transformations(lattice1, lattice2):
 	
 	# TODO: Figure out which set of the x1 x2 and x3 is the best transformation
 
+# Future final test case for overall script
 #lattice_transformations(np.array([[5.653,0], [0,5.653]], [6.481,0], [0,6.481])
 
-# TODO: test each component as a tiny function (getRational and other mini functions)
 
 # -------------------------------------------------------------------------------
 
@@ -249,15 +259,28 @@ def lattice_transformations(lattice1, lattice2):
 # print("----------------")
 
 # Unit tests for calculateM()
-print("Testing calculateM()")
+print("Testing calculateIndividualMVals()")
 print()
 
-# Testing Simple calculations 
-print("Testing identical lattices: " + str(calculateIndividualMVals([[1,0], [0,1]], [[1,0], [0,1]], 1)))
-print("Second test: " + str(calculateIndividualMVals([[1,0], [0,1]], [[2,0], [0,1]], 2)))
-print("Inversed test: " + str(calculateIndividualMVals([[1,0], [0,1]], [[1,0], [0,2]], 2)))
+# Testing Simple Calculations 
+# All answers checked against matrix multiplication calculator
+print("n = 1: " + str(calculateIndividualMVals(1)))
+print()
 
+print("n = 2: " + str(calculateIndividualMVals(2)))
+print()
 
+print("n = 3: " + str(calculateIndividualMVals(3)))
+print()
+
+print("n = 4: " + str(calculateIndividualMVals(4)))
+print()
+
+print("n = 5: " + str(calculateIndividualMVals(5)))
+print()
+
+print("n = 6: " + str(calculateIndividualMVals(6)))
+print()
 
 
 
