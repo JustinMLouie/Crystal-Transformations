@@ -70,7 +70,6 @@ def rationalizeRatio(ratio, N):
 
 # -------------------------------------------------------------------------------
 
-# Questions for Chuin Wei
 def calculateIndividualMVals(n):
 
 	"""
@@ -122,24 +121,63 @@ def calculateIndividualMVals(n):
 
 # -------------------------------------------------------------------------------
 
-def calculateAllMVals(lattice1, lattice2, nVals):
+def calculateAllMVals(nVals):
 
 	"""
 	STEP 3B
 	Calculates M matrices for all potential N values calculated in rationalizeRatio()
 	"""
 
-	xVals = []
+	mMatrices = []
 
-	for ratioPair in nVals:
-		solutions1 = calculateIndividualMVals(lattice1, lattice2, ratioPair[0])
-		for sol in solutions1:
-			xVals.append(sol)
-		solutions2 = calculateIndividualMVals(lattice1, lattice2, ratioPair[1])
-		for sol in solutions2:
-			xVals.append(sol)
+	# Calculates the mMatrices for each nVal given
+	for val in nVals:
+		solutions = calculateIndividualMVals(val)
+		for sol in solutions:
+			mMatrices.append(sol)
 
-	return xVals
+	return mMatrices
+
+# -------------------------------------------------------------------------------
+
+def calculatePercentError(lattice1, lattice2, testMatrix):
+
+	"""
+	STEP 4
+	Tests individual testMatrices to see if they are within the acceptable 1% error 
+	"""
+
+	# Represents the crystal after lattice 1 has been transformed by the test matrix
+	transformedL1 = np.cross(lattice1, testMatrix)
+
+	# Represents the lattice parameter a for each of the directions of transformedL1
+	a11 = np.linalg.norm(transformedL1[0])
+	a12 = np.linalg.norm(transformedL1[1])
+
+	# Represents the lattice parameter a for each of the directions of lattice2
+	a21 = np.linalg.norm(lattice2[0])
+	a22 = np.linalg.norm(lattice2[1])
+
+	# Represents the angle of lattice 1
+	alpha1 = np.dot(transformedL1[0], transformedL1[1])
+
+	# Represents the angle of lattice 2
+	alpha2 = np.dot(lattice2[0], lattice2[1])
+
+	# Calculates the % error between the two angles
+	angleError = abs(alpha2 - alpha1)/alpha2
+
+	# Calculates the % error between the first lattice parameters
+	aError1 = abs(a21 - a11)/a21
+
+	# Calculates the % error between the second lattice parameters
+	aError2 = abs(a22 - a12)/a22
+
+	# Returns whether or not testMatrix is a valid set of transformations
+	if (angleError <= 0.01 and aError1 <= 0.01 and aError2 <= 0.01):
+		return true
+	else:
+		return false
 
 
 # -------------------------------------------------------------------------------
@@ -182,23 +220,32 @@ def lattice_transformations(lattice1, lattice2):
 	# List of sets of n values that create the area ratios
 	nVals = []
 
-	# List of values [x1, x2, x3] that compose the M transformation matrix
-	xVals = []
+	# List of values [[x1, 0], [x2, x3]] that compose the M transformation matrix
+	mMatrices = []
+
+	acceptableMatrices = []
 
 	# STEP 1
 	# Calculates the area ratio between lattice 1 and lattice 2
 	ratio = calculateAreaRatio(lattice1, lattice2)
+	print("Ratio: " + str(ratio))
 
 	# STEP 2
 	# Calculates the integer ratio with 
-	for i in range(1,50):
-		nVals.append(rationalizeRatio(ratio, i))
-
-	print("N vals: " + nVals)
+	nVals = rationalizeRatio(ratio, 100)
+	print("N vals: " + str(nVals))
 
 	# STEP 3
 	# Calculate the possible M matrices given 
-	
+	mMatrices = calculateAllMVals(nVals)
+	print("M matrices: ")
+	print(mMatrices)
+
+	# STEP 4
+	# Determine which matrices are feasible
+	for m in mMatrices:
+		if calculatePercentError(lattice1, lattice2, m)	== true:
+			acceptableMatrices.append(m)
 	
 	# TODO: Figure out which set of the x1 x2 and x3 is the best transformation
 
@@ -259,28 +306,52 @@ def lattice_transformations(lattice1, lattice2):
 # print("----------------")
 
 # Unit tests for calculateM()
-print("Testing calculateIndividualMVals()")
-print()
+# print("Testing calculateIndividualMVals()")
+# print()
 
-# Testing Simple Calculations 
-# All answers checked against matrix multiplication calculator
+# print("n = 0: " + str(calculateIndividualMVals(0)))
+# print()
+
 print("n = 1: " + str(calculateIndividualMVals(1)))
 print()
 
-print("n = 2: " + str(calculateIndividualMVals(2)))
-print()
+# print("n = 2: " + str(calculateIndividualMVals(2)))
+# print()
 
-print("n = 3: " + str(calculateIndividualMVals(3)))
-print()
+# print("n = 3: " + str(calculateIndividualMVals(3)))
+# print()
 
 print("n = 4: " + str(calculateIndividualMVals(4)))
 print()
 
-print("n = 5: " + str(calculateIndividualMVals(5)))
+# print("n = 5: " + str(calculateIndividualMVals(5)))
+# print()
+
+# print("n = 6: " + str(calculateIndividualMVals(6)))
+# print()
+
+# print("----------------")
+
+# print("Testing calculateAllMVals()")
+# print()
+
+# print("Set 0,1: " + str(calculateAllMVals([0,1])))
+
+# print("Set 1,2: " + str(calculateAllMVals([1,2])))
+
+# # The n values used for CdTe GaAs example, provides same outpouts
+# print("Set 3,4: " + str(calculateAllMVals([3,4])))
+
+print("----------------")
 print()
 
-print("n = 6: " + str(calculateIndividualMVals(6)))
+print("Testing lattice_transformations()")
 print()
+
+lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])
+
+
+
 
 
 
