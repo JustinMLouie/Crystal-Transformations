@@ -110,13 +110,6 @@ def calculateIndividualMVals(n):
 					# print("x2 = " + str(x2))
 					# print("x3 = " + str(x3))
 
-					# m = [[x1, x2], [0, x3]]
-
-					# temp = np.dot(m, lattice1)
-
-					# if ((np.dot(m, lattice1) == lattice2).all()):
-					# 	return x1, x2, x3
-
 	return solutions
 
 # -------------------------------------------------------------------------------
