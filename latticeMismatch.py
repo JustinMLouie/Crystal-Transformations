@@ -147,37 +147,58 @@ def calculatePercentError(lattice1, lattice2, testMatrix):
 	Tests individual testMatrices to see if they are within the acceptable 1% error 
 	"""
 
+	print("lattice1")
+	print(lattice1)
+
+	print("lattice2")
+	print(lattice2)
+
+	print("testMatrix")
+	print(testMatrix)
+
 	# Represents the crystal after lattice 1 has been transformed by the test matrix
-	transformedL1 = np.cross(lattice1, testMatrix)
+	transformedL1 = np.dot(lattice1, testMatrix)
+	print("transformedL1")
+	print(transformedL1)
 
 	# Represents the lattice parameter a for each of the directions of transformedL1
 	a11 = np.linalg.norm(transformedL1[0])
+	print("A11: " + str(a11))
 	a12 = np.linalg.norm(transformedL1[1])
+	print("A12: " + str(a12))
 
 	# Represents the lattice parameter a for each of the directions of lattice2
 	a21 = np.linalg.norm(lattice2[0])
+	print("A21: " + str(a21))
 	a22 = np.linalg.norm(lattice2[1])
+	print("A22: " + str(a22))
 
 	# Represents the angle of lattice 1
-	alpha1 = np.dot(transformedL1[0], transformedL1[1])
+	alpha1 = np.degrees(np.arccos(np.dot(transformedL1[0], transformedL1[1]) / (a11 * a12)))
+	print("Alpha 1: " + str(alpha1))
+
 
 	# Represents the angle of lattice 2
-	alpha2 = np.dot(lattice2[0], lattice2[1])
+	alpha2 = np.degrees(np.arccos(np.dot(lattice2[0], lattice2[1]) / (a21 * a22)))
+	print("Alpha 2: " + str(alpha2))
 
 	# Calculates the % error between the two angles
 	angleError = abs(alpha2 - alpha1)/alpha2
+	print("angleError: " + str(angleError))
 
 	# Calculates the % error between the first lattice parameters
 	aError1 = abs(a21 - a11)/a21
+	print("aError1 " + str(aError1))
 
 	# Calculates the % error between the second lattice parameters
 	aError2 = abs(a22 - a12)/a22
+	print("aError2 " + str(aError2))
 
 	# Returns whether or not testMatrix is a valid set of transformations
 	if (angleError <= 0.01 and aError1 <= 0.01 and aError2 <= 0.01):
-		return true
+		return True
 	else:
-		return false
+		return False
 
 
 # -------------------------------------------------------------------------------
@@ -244,14 +265,12 @@ def lattice_transformations(lattice1, lattice2):
 	# STEP 4
 	# Determine which matrices are feasible
 	for m in mMatrices:
-		if calculatePercentError(lattice1, lattice2, m)	== true:
+		if calculatePercentError(lattice1, lattice2, m)	== True:
 			acceptableMatrices.append(m)
 	
 	# TODO: Figure out which set of the x1 x2 and x3 is the best transformation
 
 # Future final test case for overall script
-#lattice_transformations(np.array([[5.653,0], [0,5.653]], [6.481,0], [0,6.481])
-
 
 # -------------------------------------------------------------------------------
 
@@ -345,10 +364,22 @@ print()
 print("----------------")
 print()
 
-print("Testing lattice_transformations()")
+print("Testing calculatePercentError()")
 print()
 
-lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])
+# Standard test with simple numbers easy to calculate with
+print(calculatePercentError([[1,0], [0,1]], [[2,0], [0,2]], [[4, 0], [0, 1]]))
+
+# Testing a case with an acceptable erro
+print(calculatePercentError([[1,0], [0,1]], [[1.001,0], [0,1.001]], [[1, 0], [0, 1]]))
+
+# print("----------------")
+# print()
+
+# print("Testing lattice_transformations()")
+# print()
+
+# lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])
 
 
 
