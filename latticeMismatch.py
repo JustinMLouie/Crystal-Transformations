@@ -45,8 +45,10 @@ def rationalizeRatio(ratio, N):
 	d = 1
 
 	# Flip ratio if it is greater than 1 to fit rationalizeRatio
-	if(ratio > 1):
+	if (ratio > 1):
 		ratio = 1 / ratio
+	elif (ratio == 1):
+		return 1,1
 
 	while (b <= N and d <= N):
 		mediant = float(a+c)/(b+d)
@@ -290,18 +292,16 @@ def lattice_transformations(lattice1, lattice2):
 
 # print("----------------")
 
-# # Unit tests for rationalizeRatio()
-# print("Testing rationalizeRatio()")
-# print()
+# Unit tests for rationalizeRatio()
+print("Testing rationalizeRatio()")
+print()
 
-# # Testing known number ratios
-# print("1/2: " + str(rationalizeRatio(0.500, 1000)))
-# print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
-# print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
-# print("1/4: " + str(rationalizeRatio(0.25, 1000)))
-
-# # TODO: Fix when ratio = 1, algorithm does not have a numerator == denominator
-# print("1/1: " + str(rationalizeRatio(1.000, 1000)))
+# Testing known number ratios
+print("1/2: " + str(rationalizeRatio(0.500, 1000)))
+print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
+print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
+print("1/4: " + str(rationalizeRatio(0.25, 1000)))
+print("1/1: " + str(rationalizeRatio(1.000, 1000)))
 
 # print()
 
@@ -374,9 +374,9 @@ print()
 # print("Testing lattice_transformations()")
 # print()
 
-print("Testing lattice transformation with integers: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+# print("Testing lattice transformation with integers: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
 
-print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+# print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
 
 
 
