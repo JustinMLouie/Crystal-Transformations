@@ -131,7 +131,12 @@ def calculateAllMVals(nVals):
 		for sol in solutions:
 			mMatrices.append(sol)
 
-	return mMatrices
+	finalMatrices = []
+	for m in mMatrices:
+		if m not in finalMatrices:
+			finalMatrices.append(m)
+
+	return finalMatrices
 
 # -------------------------------------------------------------------------------
 
@@ -172,7 +177,6 @@ def calculatePercentError(lattice1, lattice2, testMatrix):
 	alpha1 = np.degrees(np.arccos(np.dot(transformedL1[0], transformedL1[1]) / (a11 * a12)))
 	# print("Alpha 1: " + str(alpha1))
 
-
 	# Represents the angle of lattice 2
 	alpha2 = np.degrees(np.arccos(np.dot(lattice2[0], lattice2[1]) / (a21 * a22)))
 	# print("Alpha 2: " + str(alpha2))
@@ -181,16 +185,48 @@ def calculatePercentError(lattice1, lattice2, testMatrix):
 	angleError = abs(alpha2 - alpha1)/alpha2
 	# print("angleError: " + str(angleError))
 
-	# Calculates the % error between the first lattice parameters
-	aError1 = abs(a21 - a11)/a21
-	# print("aError1 " + str(aError1))
+	# Calculates the error of the first matrix position
+	if (lattice2[0][0] != 0):
+		aError00 =  abs(lattice2[0][0] - transformedL1[0,0]) / lattice2[0][0]
+	elif (transformedL1[0,0] != 0):
+		aError00 =  abs(lattice2[0][0] - transformedL1[0,0]) / transformedL1[0,0]
+	else: 
+		aError00 = 0
 
-	# Calculates the % error between the second lattice parameters
-	aError2 = abs(a22 - a12)/a22
-	# print("aError2 " + str(aError2))
+	# Calculates the error of the first matrix position
+	if (lattice2[0][1] != 0):
+		aError01 =  abs(lattice2[0][1] - transformedL1[0,1]) / lattice2[0][1]
+	elif (transformedL1[0,1] != 0):
+		aError01 =  abs(lattice2[0][1] - transformedL1[0,1]) / transformedL1[0,1]
+	else: 
+		aError01 = 0
+
+	# Calculates the error of the first matrix position
+	if (lattice2[1][0] != 0):
+		aError10 =  abs(lattice2[1][0] - transformedL1[1,0]) / lattice2[1][0]
+	elif (transformedL1[1,0] != 0):
+		aError10 =  abs(lattice2[1][0] - transformedL1[1,0]) / transformedL1[1,0]
+	else: 
+		aError10 = 0
+
+	# Calculates the error of the first matrix position
+	if (lattice2[1][1] != 0):
+		aError11 =  abs(lattice2[1][1] - transformedL1[1,1]) / lattice2[1][1]
+	elif (transformedL1[0,1] != 0):
+		aError11 =  abs(lattice2[1][1] - transformedL1[1,1]) / transformedL1[1,1]
+	else: 
+		aError11 = 0
+
+	# # Calculates the % error between the first lattice parameters
+	# aError1 = abs(a21 - a11)/a21
+	# # print("aError1 " + str(aError1))
+
+	# # Calculates the % error between the second lattice parameters
+	# aError2 = abs(a22 - a12)/a22
+	# # print("aError2 " + str(aError2))
 
 	# Returns whether or not testMatrix is a valid set of transformations
-	if (angleError <= 0.01 and aError1 <= 0.01 and aError2 <= 0.01):
+	if (angleError <= 0.01 and aError00 <= 0.01 and aError01 <= 0.01 and aError10 <= 0.01 and aError11 <= 0.01):
 		return True
 	else:
 		return False
@@ -275,8 +311,9 @@ def lattice_transformations(lattice1, lattice2):
 # print("Testing calculateAreaRatio()")
 # print()
 
-# # Test of 1 to 1
+# Test of 1 to 1
 # print("Identical Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[1,0], [0,1]])))
+# print("Flipped Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[0,1], [1,0]])))
 
 
 # # Test 9/4 = 5.6025
@@ -293,15 +330,15 @@ def lattice_transformations(lattice1, lattice2):
 # print("----------------")
 
 # Unit tests for rationalizeRatio()
-print("Testing rationalizeRatio()")
-print()
+# print("Testing rationalizeRatio()")
+# print()
 
 # Testing known number ratios
-print("1/2: " + str(rationalizeRatio(0.500, 1000)))
-print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
-print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
-print("1/4: " + str(rationalizeRatio(0.25, 1000)))
-print("1/1: " + str(rationalizeRatio(1.000, 1000)))
+# print("1/2: " + str(rationalizeRatio(0.500, 1000)))
+# print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
+# print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
+# print("1/4: " + str(rationalizeRatio(0.25, 1000)))
+# print("1/1: " + str(rationalizeRatio(1.000, 1000)))
 
 # print()
 
@@ -363,20 +400,37 @@ print()
 # print()
 
 # Standard test with simple numbers easy to calculate with
-# print(calculatePercentError([[1,0], [0,1]], [[2,0], [0,2]], [[4, 0], [0, 1]]))
+print(calculatePercentError([[1,0], [0,1]], [[2,0], [0,2]], [[4, 0], [0, 1]]))
+
+# Testing lattice matrix 
+print(calculatePercentError([[1,0], [0,1]], [[0,1], [1,0]], [[1, 0], [0, 1]]))
 
 # Testing a case with an acceptable erro
 # print(calculatePercentError([[1,0], [0,1]], [[1.001,0], [0,1.001]], [[1, 0], [0, 1]]))
 
-# print("----------------")
-# print()
+print("----------------")
+print()
 
-# print("Testing lattice_transformations()")
-# print()
+print("Testing lattice_transformations()")
+print()
 
-# print("Testing lattice transformation with integers: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
 
-# print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+
+print("Testing 2x Lattice with rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,2], [2,0]])))
+
+print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
+
+print("Testing 3x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,3], [3,0]])))
+
+print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]])))
+
+print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,4], [4,0]])))
+
+print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+
+
 
 
 
