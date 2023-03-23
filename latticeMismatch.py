@@ -217,14 +217,6 @@ def calculatePercentError(lattice1, lattice2, testMatrix):
 	else: 
 		aError11 = 0
 
-	# # Calculates the % error between the first lattice parameters
-	# aError1 = abs(a21 - a11)/a21
-	# # print("aError1 " + str(aError1))
-
-	# # Calculates the % error between the second lattice parameters
-	# aError2 = abs(a22 - a12)/a22
-	# # print("aError2 " + str(aError2))
-
 	# Returns whether or not testMatrix is a valid set of transformations
 	if (angleError <= 0.01 and aError00 <= 0.01 and aError01 <= 0.01 and aError10 <= 0.01 and aError11 <= 0.01):
 		return True
