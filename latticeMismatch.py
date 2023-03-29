@@ -75,7 +75,7 @@ def rationalizeRatio(ratio, N):
 def calculateIndividualMVals(n):
 
 	"""
-	STEP 4A
+	STEP 3
 	Determines the potential M matrices that represents the transformations 
 	to get from L1 to L2
 	Equation 2.3 of Lattice Match: An Application to heteroepitaxy
@@ -116,112 +116,38 @@ def calculateIndividualMVals(n):
 
 # -------------------------------------------------------------------------------
 
-def calculateAllMVals(nVals):
+def calculatePercentError(lattice1, lattice2, mMatrices, nMatrices):
 
 	"""
-	STEP 4B
-	Calculates M matrices for all potential N values calculated in rationalizeRatio()
-	"""
-
-	mMatrices = []
-
-	# Calculates the mMatrices for each nVal given
-	for val in nVals:
-		solutions = calculateIndividualMVals(val)
-		for sol in solutions:
-			mMatrices.append(sol)
-
-	finalMatrices = []
-	for m in mMatrices:
-		if m not in finalMatrices:
-			finalMatrices.append(m)
-
-	return finalMatrices
-
-# -------------------------------------------------------------------------------
-
-def calculatePercentError(lattice1, lattice2, testMatrix):
-
-	"""
-	STEP 5
+	STEP 4
 	Tests individual testMatrices to see if they are within the acceptable 1% error 
 	"""
 
-	# print("lattice1")
-	# print(lattice1)
+	# Variables to store the best M, N, and error set
+	bestM = []
+	bestN = []
+	smallestErr = 100000000
 
-	# print("lattice2")
-	# print(lattice2)
+	# Iterates to test each pair of m and n matrices for lowest error
+	for m in mMatrices:
+		for n in nMatrices:
+			# Represents the crystal after lattices have undergone transformations to be close 
+			transformedL1 = np.dot(lattice1, n)
+			transformedL2 = np.dot(lattice2, m)
 
-	# print("testMatrix")
-	# print(testMatrix)
+			# Calculates the root mean square difference between matrices
+			diff = ((transformedL2[0][0] - transformedL1[0][0]) ** 2) + \
+			((transformedL2[0][1] - transformedL1[0][1]) ** 2) + \
+			((transformedL2[1][0] - transformedL1[1][0]) ** 2) + \
+			((transformedL2[1][1] - transformedL1[1][1]) ** 2)
 
-	# Represents the crystal after lattice 1 has been transformed by the test matrix
-	transformedL1 = np.dot(lattice1, testMatrix)
-	# print("transformedL1")
-	# print(transformedL1)
+			# Updates the best set of transformations if current set has smaller diff
+			if diff < smallestErr:
+				bestM = m
+				bestN = n
+				smallestErr = diff
 
-	# Represents the lattice parameter a for each of the directions of transformedL1
-	a11 = np.linalg.norm(transformedL1[0])
-	# print("A11: " + str(a11))
-	a12 = np.linalg.norm(transformedL1[1])
-	# print("A12: " + str(a12))
-
-	# Represents the lattice parameter a for each of the directions of lattice2
-	a21 = np.linalg.norm(lattice2[0])
-	# print("A21: " + str(a21))
-	a22 = np.linalg.norm(lattice2[1])
-	# print("A22: " + str(a22))
-
-	# Represents the angle of lattice 1
-	alpha1 = np.degrees(np.arccos(np.dot(transformedL1[0], transformedL1[1]) / (a11 * a12)))
-	# print("Alpha 1: " + str(alpha1))
-
-	# Represents the angle of lattice 2
-	alpha2 = np.degrees(np.arccos(np.dot(lattice2[0], lattice2[1]) / (a21 * a22)))
-	# print("Alpha 2: " + str(alpha2))
-
-	# Calculates the % error between the two angles
-	angleError = abs(alpha2 - alpha1)/alpha2
-	# print("angleError: " + str(angleError))
-
-	# Calculates the error of the first matrix position
-	if (lattice2[0][0] != 0):
-		aError00 =  abs(lattice2[0][0] - transformedL1[0,0]) / lattice2[0][0]
-	elif (transformedL1[0,0] != 0):
-		aError00 =  abs(lattice2[0][0] - transformedL1[0,0]) / transformedL1[0,0]
-	else: 
-		aError00 = 0
-
-	# Calculates the error of the first matrix position
-	if (lattice2[0][1] != 0):
-		aError01 =  abs(lattice2[0][1] - transformedL1[0,1]) / lattice2[0][1]
-	elif (transformedL1[0,1] != 0):
-		aError01 =  abs(lattice2[0][1] - transformedL1[0,1]) / transformedL1[0,1]
-	else: 
-		aError01 = 0
-
-	# Calculates the error of the first matrix position
-	if (lattice2[1][0] != 0):
-		aError10 =  abs(lattice2[1][0] - transformedL1[1,0]) / lattice2[1][0]
-	elif (transformedL1[1,0] != 0):
-		aError10 =  abs(lattice2[1][0] - transformedL1[1,0]) / transformedL1[1,0]
-	else: 
-		aError10 = 0
-
-	# Calculates the error of the first matrix position
-	if (lattice2[1][1] != 0):
-		aError11 =  abs(lattice2[1][1] - transformedL1[1,1]) / lattice2[1][1]
-	elif (transformedL1[0,1] != 0):
-		aError11 =  abs(lattice2[1][1] - transformedL1[1,1]) / transformedL1[1,1]
-	else: 
-		aError11 = 0
-
-	# Returns whether or not testMatrix is a valid set of transformations
-
-	return (angleError <= 0.1 and aError00 <= 0.1 and aError01 <= 0.1 and aError10 <= 0.1 and aError11 <= 0.1)
-	# return True
-
+	return [bestM, bestN, smallestErr]
 
 # -------------------------------------------------------------------------------
 
@@ -271,25 +197,22 @@ def lattice_transformations(lattice1, lattice2):
 	# STEP 1
 	# Calculates the area ratio between lattice 1 and lattice 2
 	ratio = calculateAreaRatio(lattice1, lattice2)
-	# print("Ratio: " + str(ratio))
 
 	# STEP 2
 	# Calculates the integer ratio with 
 	nVals = rationalizeRatio(ratio, 1000)
-	# print("N vals: " + str(nVals))
 
 
 	# STEP 3
 	# Calculate the possible M matrices given 
-	mMatrices = calculateAllMVals(nVals)
-	# print("M matrices: ")
-	# print(mMatrices)
+	# mMatrices: matrices to multiply lattice2 by
+	# nMatrices: matrices to multiply lattice1 by
+	mMatrices = calculateIndividualMVals(nVals[0])
+	nMatrices = calculateIndividualMVals(nVals[1])
 
 	# STEP 4
-	# Determine which matrices are feasible
-	for m in mMatrices:
-		if calculatePercentError(lattice1, lattice2, m) == True:
-			acceptableMatrices.append(m)
+	# Determine which matrix set has the lowest error
+	acceptableMatrices = calculatePercentError(lattice1, lattice2, mMatrices, nMatrices)
 
 	return acceptableMatrices
 	
@@ -385,14 +308,14 @@ def lattice_transformations(lattice1, lattice2):
 # # The n values used for CdTe GaAs example, provides same outpouts
 # print("Set 3,4: " + str(calculateAllMVals([3,4])))
 
-print("----------------")
-print()
+# print("----------------")
+# print()
 
 # print("Testing calculatePercentError()")
 # print()
 
 # Standard test with simple numbers easy to calculate with
-# print(calculatePercentError([[1,0], [0,1]], [[2,0], [0,2]], [[4, 0], [0, 1]]))
+# print(calculatePercentError([[1,0], [0,1]], [[2,0], [0,2]], [[1, 0], [0, 1]], [[2, 0], [0, 2]]))
 
 # Testing lattice matrix 
 # print(calculatePercentError([[1,0], [0,1]], [[0,1], [1,0]], [[1, 0], [0, 1]]))
@@ -400,15 +323,15 @@ print()
 # Testing a case with an acceptable erro
 # print(calculatePercentError([[1,0], [0,1]], [[1.001,0], [0,1.001]], [[1, 0], [0, 1]]))
 
-print("----------------")
-print()
+# print("----------------")
+# print()
 
 print("Testing lattice_transformations()")
 print()
 
 # print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
 
-print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+# print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
 
 # print("Testing 2x Lattice with rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,2], [2,0]])))
 
@@ -424,19 +347,19 @@ print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0
 
 # print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
 
-# # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2997 HgBrN
-print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[4.02,0], [0,4.46]])))
+# http://www.2dmatpedia.org/2dmaterials/doc/2dm-2997 HgBrN
+# print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[4.02,0], [0,4.46]])))
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2998 LiMg: 3.18
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-3000 VTe2: 3.65
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
 
-print("Testing Ga to LiMg: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[3.18,0], [0,3.18]])))
+# print("Testing Ga to LiMg: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[3.18,0], [0,3.18]])))
 
 # print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[4.32,0], [0,4.32]])))
 
-# print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[3.18,0], [0,3.18]], [[4.32,0], [0,4.32]])))
+print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[3.18,0], [0,3.18]], [[4.32,0], [0,4.32]])))
 
 
 
