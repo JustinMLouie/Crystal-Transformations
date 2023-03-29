@@ -116,7 +116,7 @@ def calculateIndividualMVals(n):
 
 # -------------------------------------------------------------------------------
 
-def calculatePercentError(lattice1, lattice2, mMatrices, nMatrices):
+def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
 	"""
 	STEP 4
@@ -212,7 +212,7 @@ def lattice_transformations(lattice1, lattice2):
 
 	# STEP 4
 	# Determine which matrix set has the lowest error
-	acceptableMatrices = calculatePercentError(lattice1, lattice2, mMatrices, nMatrices)
+	acceptableMatrices = determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices)
 
 	return acceptableMatrices
 	
@@ -329,13 +329,13 @@ def lattice_transformations(lattice1, lattice2):
 print("Testing lattice_transformations()")
 print()
 
-# print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
+print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
 
-# print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
 
 # print("Testing 2x Lattice with rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,2], [2,0]])))
 
-# print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
+print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
 
 # print("Testing 3x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,3], [3,0]])))
 
@@ -355,9 +355,9 @@ print()
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-3000 VTe2: 3.65
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
 
-# print("Testing Ga to LiMg: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[3.18,0], [0,3.18]])))
+print("Testing Ga to LiMg: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[3.18,0], [0,3.18]])))
 
-# print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[4.32,0], [0,4.32]])))
+print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[4.32,0], [0,4.32]])))
 
 print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[3.18,0], [0,3.18]], [[4.32,0], [0,4.32]])))
 
