@@ -72,15 +72,6 @@ def rationalizeRatio(ratio, N):
 
 # -------------------------------------------------------------------------------
 
-def calculateSuperLattice(lattice, n):
-	lattice[0][0] = lattice[0][0] * n
-	lattice[0][1] = lattice[0][1] * n
-	lattice[1][0] = lattice[1][0] * n
-	lattice[1][1] = lattice[1][1] * n
-	return lattice
-
-# -------------------------------------------------------------------------------
-
 def calculateIndividualMVals(n):
 
 	"""
@@ -227,10 +218,9 @@ def calculatePercentError(lattice1, lattice2, testMatrix):
 		aError11 = 0
 
 	# Returns whether or not testMatrix is a valid set of transformations
-	if (angleError <= 0.01 and aError00 <= 0.01 and aError01 <= 0.01 and aError10 <= 0.01 and aError11 <= 0.01):
-		return True
-	else:
-		return False
+
+	return (angleError <= 0.1 and aError00 <= 0.1 and aError01 <= 0.1 and aError10 <= 0.1 and aError11 <= 0.1)
+	# return True
 
 
 # -------------------------------------------------------------------------------
@@ -285,24 +275,20 @@ def lattice_transformations(lattice1, lattice2):
 
 	# STEP 2
 	# Calculates the integer ratio with 
-	nVals = rationalizeRatio(ratio, 100)
+	nVals = rationalizeRatio(ratio, 1000)
 	# print("N vals: " + str(nVals))
 
-	# STEP 3
-	# Calculate the supercells for Lattice 1 and Lattice 2
-	superLattice1 = calculateSuperLattice(lattice1, nVals[0])
-	superLattice2 = calculateSuperLattice(lattice2, nVals[1])
 
-	# STEP 4
+	# STEP 3
 	# Calculate the possible M matrices given 
 	mMatrices = calculateAllMVals(nVals)
 	# print("M matrices: ")
 	# print(mMatrices)
 
-	# STEP 5
+	# STEP 4
 	# Determine which matrices are feasible
 	for m in mMatrices:
-		if calculatePercentError(superLattice1, superLattice2, m) == True:
+		if calculatePercentError(lattice1, lattice2, m) == True:
 			acceptableMatrices.append(m)
 
 	return acceptableMatrices
@@ -420,36 +406,37 @@ print()
 print("Testing lattice_transformations()")
 print()
 
-print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
+# print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
 
 print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
 
-print("Testing 2x Lattice with rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,2], [2,0]])))
+# print("Testing 2x Lattice with rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,2], [2,0]])))
 
-print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
+# print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
 
-print("Testing 3x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,3], [3,0]])))
+# print("Testing 3x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,3], [3,0]])))
 
-print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]])))
+# print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]])))
 
-print("Testing Non-rectangular Lattice2: " + str(lattice_transformations([[1,0], [0,4]], [[1,0], [0,4]])))
+# print("Testing Non-rectangular Lattice2: " + str(lattice_transformations([[1,0], [0,4]], [[1,0], [0,4]])))
 
-print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,4], [4,0]])))
+# print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,4], [4,0]])))
 
-print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
+# print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
 
-# http://www.2dmatpedia.org/2dmaterials/doc/2dm-2997 HgBrN
+# # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2997 HgBrN
 print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[4.02,0], [0,4.46]])))
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2998 LiMg: 3.18
+# http://www.2dmatpedia.org/2dmaterials/doc/2dm-3000 VTe2: 3.65
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
 
 print("Testing Ga to LiMg: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[3.18,0], [0,3.18]])))
 
-print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[4.32,0], [0,4.32]])))
+# print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[4.32,0], [0,4.32]])))
 
-print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[3.18,0], [0,3.18]], [[4.32,0], [0,4.32]])))
+# print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[3.18,0], [0,3.18]], [[4.32,0], [0,4.32]])))
 
 
 
