@@ -15,13 +15,13 @@ def calculateAreaRatio(lattice1, lattice2):
 
 	# Lattice 1 area calculations
 	#np.linalg.det() - google this to figure out how to get area and take abs of it
-	area1 = np.linalg.norm(np.cross(lattice1[0], lattice1[1]))
+	area1 = np.linalg.norm(abs(np.cross(lattice1[0], lattice1[1])))
 
 	# Lattice 2 area calculations 
-	area2 = np.linalg.norm(np.cross(lattice2[0], lattice2[1]))
+	area2 = np.linalg.norm(abs(np.cross(lattice2[0], lattice2[1])))
 
 	# n calculation
-	ratio = area2 / area1
+	ratio = abs(area2 / area1)
 
 	return ratio
 
@@ -108,10 +108,6 @@ def calculateIndividualMVals(n):
 				if ((x1 * x3 == n) and (x2 <= (x3 - 1))):
 					solutions.append([[x1, x2], [0,x3]])
 
-					# print("x1 = " + str(x1))
-					# print("x2 = " + str(x2))
-					# print("x3 = " + str(x3))
-
 	return solutions
 
 # -------------------------------------------------------------------------------
@@ -120,34 +116,70 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
 	"""
 	STEP 4
-	Tests individual testMatrices to see if they are within the acceptable 1% error 
+	Tests sets of testMatrices to determine which matrixes result in the smallest difference between lattice1 and lattice2
+	Determines which angle has the smallest difference in superlattices
 	"""
 
-	# Variables to store the best M, N, and error set
-	bestM = []
-	bestN = []
-	smallestErr = 100000000
+	# Large error that the first comparison will likely be set to, making it set the first set as the best
+	smallestErr = 1000000
 
 	# Iterates to test each pair of m and n matrices for lowest error
 	for m in mMatrices:
 		for n in nMatrices:
-			# Represents the crystal after lattices have undergone transformations to be close 
-			transformedL1 = np.dot(lattice1, n)
-			transformedL2 = np.dot(lattice2, m)
+			for theta in range(0,360):
+				# Temp matrix to test counterclockwise rotation
 
-			# Calculates the root mean square difference between matrices
-			diff = ((transformedL2[0][0] - transformedL1[0][0]) ** 2) + \
-			((transformedL2[0][1] - transformedL1[0][1]) ** 2) + \
-			((transformedL2[1][0] - transformedL1[1][0]) ** 2) + \
-			((transformedL2[1][1] - transformedL1[1][1]) ** 2)
+				# Represents the crystal after lattices have undergone transformations to be close 
+				transformedL1 = np.dot(lattice1, n)
+				transformedL2 = np.dot(lattice2, m)
 
-			# Updates the best set of transformations if current set has smaller diff
-			if diff < smallestErr:
-				bestM = m
-				bestN = n
-				smallestErr = diff
+				# print("-------------------------------------------------")
 
-	return [bestM, bestN, smallestErr]
+
+				# print("m: " + str(m))
+				# print("n: " + str(n))
+
+				# print("lattice1: " + str(lattice1))
+				# print("lattice2: " + str(lattice2))
+
+				# print("pre-rotation transformedL1: " + str(transformedL1))
+				# print("pre-rotation transformedL2: " + str(transformedL2))
+
+				radianTheta = np.radians(theta)
+
+				rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)], \
+				[np.sin(radianTheta), np.cos(radianTheta)]]
+
+				# print("Theta: " + str(theta) + " | radians: " + str(radianTheta))
+
+				# print("Rotation")
+				# print(rotation)
+
+				# Applies rotation matrix to L1 
+				transformedL1 = np.dot(transformedL1, rotation)
+				# print("Rotated transformedL1")
+				# print(transformedL1)
+
+				# print("transformedL2")
+				# print(transformedL2)
+
+				# Calculates the root mean square difference between matrices
+				diff = np.sqrt(((transformedL2[0][0] - transformedL1[0][0]) ** 2) + \
+				((transformedL2[0][1] - transformedL1[0][1]) ** 2) + \
+				((transformedL2[1][0] - transformedL1[1][0]) ** 2) + \
+				((transformedL2[1][1] - transformedL1[1][1]) ** 2))
+
+				# print("theta: " + str(theta) + " | diff: " + str(diff) + " | smallestErr: " + str(smallestErr))
+				# print("")
+
+				# Updates the best set of transformations if current set has smaller diff
+				if (diff < smallestErr): 
+					smallestErr = diff
+					bestM = m
+					bestN = n
+					bestR = theta
+
+	return [bestM, bestN, bestR, smallestErr]
 
 # -------------------------------------------------------------------------------
 
@@ -329,37 +361,119 @@ def lattice_transformations(lattice1, lattice2):
 print("Testing lattice_transformations()")
 print()
 
-print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
+# print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
 
-print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+# print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
 
-# print("Testing 2x Lattice with rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,2], [2,0]])))
+# print("Testing 2x Lattice with 90 deg rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,-2], [2,0]])))
 
-print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
+# print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
 
-# print("Testing 3x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,3], [3,0]])))
+# print("Testing 3x Lattice with  90 deg rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-3], [3,0]])))
 
 # print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]])))
 
 # print("Testing Non-rectangular Lattice2: " + str(lattice_transformations([[1,0], [0,4]], [[1,0], [0,4]])))
 
-# print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,4], [4,0]])))
+# print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-4], [4,0]])))
 
-# print("Testing CdTe and GaAs: " + str(lattice_transformations([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
-
-# http://www.2dmatpedia.org/2dmaterials/doc/2dm-2997 HgBrN
-# print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[4.02,0], [0,4.46]])))
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2998 LiMg: 3.18
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-3000 VTe2: 3.65
+# http://www.2dmatpedia.org/2dmaterials/doc/2dm-2997 HgBrN 4.02, 4.46
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
 
-print("Testing Ga to LiMg: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[3.18,0], [0,3.18]])))
+lengthGaAs = 5.653
+lengthCdTe = 6.481
 
-print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[2.66,0], [0,2.66]], [[4.32,0], [0,4.32]])))
+lengthGa = 2.66
+lengthLiMg = 3.18
+lengthVTe2 = 3.65
+lengthHgBrN_1 = 4.02
+lengthHgBrN_2 = 4.46
+lengthSbTe3 = 4.32
 
-print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[3.18,0], [0,3.18]], [[4.32,0], [0,4.32]])))
+print("Testing GaAs and CdTe: " + str(lattice_transformations([[lengthGaAs,0], [0,lengthGaAs]], [[lengthCdTe,0], [0,lengthCdTe]])))
+
+print("Testing Ga to LiMg: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthLiMg,0], [0,lengthLiMg]])))
+
+print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
+
+print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[lengthLiMg,0], [0,lengthLiMg]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
+
+print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[lengthHgBrN_1,0], [0,lengthHgBrN_2]])))
+
+# print("----------------")
+# print()
+
+# print("Testing Angle Rotations")
+# print()
+
+# angle = np.radians(30)
+
+# rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+
+# print("30 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation)))
+
+# #---------
+
+# angle = np.radians(40)
+
+# rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+
+# print("40 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation)))
+
+# #---------
+
+# angle = np.radians(45)
+
+# rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+
+# originalL2 = [[2,0], [0,2]]
+
+# newL2 = np.dot(originalL2, rotation)
+
+# print("45 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2)))
+
+# #---------
+
+# angle = np.radians(60)
+
+# rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+
+# originalL2 = [[2,0], [0,2]]
+
+# newL2 = np.dot(originalL2, rotation)
+
+# print("60 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2)))
+
+# # ---------
+
+# angle = np.radians(25)
+
+# rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+
+# originalL2 = [[2,0], [0,2]]
+
+# newL2 = np.dot(originalL2, rotation)
+
+# print("25 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2)))
+
+# http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
+# http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
+
+angle = np.radians(25)
+
+rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+
+originalL2 = [[lengthSbTe3,0], [0,lengthSbTe3]]
+
+newL2 = np.dot(originalL2, rotation)
+
+
+print("Ga vs SbTe3 with 25 degree rotation: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], newL2)))
+
 
 
 
