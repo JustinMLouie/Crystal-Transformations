@@ -1,12 +1,10 @@
 import numpy as np
-import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
-
 def calculateAreaRatio(lattice1, lattice2):
-	""" 
+	"""
 	STEP 1
 	Calculates the ratio between the areas of the 2 selected crystals
 	Equation 2.1 of Lattice Match: An Application to heteroepitaxy
@@ -18,7 +16,7 @@ def calculateAreaRatio(lattice1, lattice2):
 	# Lattice 1 area calculations
 	area1 = np.linalg.norm(abs(np.cross(lattice1[0], lattice1[1])))
 
-	# Lattice 2 area calculations 
+	# Lattice 2 area calculations
 	area2 = np.linalg.norm(abs(np.cross(lattice2[0], lattice2[1])))
 
 	# n calculation
@@ -26,7 +24,6 @@ def calculateAreaRatio(lattice1, lattice2):
 
 	return ratio
 
-# -------------------------------------------------------------------------------
 
 def rationalizeRatio(ratio, N, maxErr):
 	"""
@@ -34,7 +31,7 @@ def rationalizeRatio(ratio, N, maxErr):
 	Calculates a set of numbers that form a rational number with a ratio
 	Equation 2.2 of Lattice Match: An Application to heteroepitaxy
 	Example shown in equation 3.1
-	Taken from # https://www.johndcook.com/blog/2010/10/20/best-rational-approximation/
+	Taken from www.johndcook.com/blog/2010/10/20/best-rational-approximation/
 
 	Intakes number 0 < x < 1
 	Maximum denominator = N
@@ -49,45 +46,44 @@ def rationalizeRatio(ratio, N, maxErr):
 	if (ratio > 1):
 		ratio = 1 / ratio
 	elif (ratio == 1):
-		return 1,1
+		return 1, 1
 
 	while (b <= N and d <= N):
-		mediant = float(a+c)/(b+d)
+		mediant = float(a + c) / (b + d)
 		# checks if it is within the user input accepted error
-		if (abs(ratio - mediant)/ratio <= maxErr):
+		if (abs(ratio - mediant) / ratio <= maxErr):
 			if b + d <= N:
-				return a+c, b+d
+				return a + c, b + d
 			elif d > b:
 				return c, d
 			else:
 				return a, b
 		elif ratio > mediant:
-			a, b = a+c, b+d
+			a, b = a + c, b + d
 		else:
-			c, d = a+c, b+d
+			c, d = a + c, b + d
 
 	if (b > N):
 		return c, d
 	else:
 		return a, b
 
-# -------------------------------------------------------------------------------
 
 def calculateIndividualMVals(n):
 
 	"""
 	STEP 3
-	Determines the potential M matrices that represents the transformations 
+	Determines the potential M matrices that represents the transformations
 	to get from L1 to L2
 	Equation 2.3 of Lattice Match: An Application to heteroepitaxy
-	Example shown in  3.2 and 3.3
+	Example shown in 3.2 and 3.3
 
-	Formula: 
-	  L2    =    M      *   L1 - is a square matrix so might be able to take inverse
+	Formula:
+	L2 = M * L1
 	| a2 | = | i j | * | a1 |
-	| b2 |   | 0 m |   | b1 |
+	| b2 | = | 0 m | * | b1 |
 
-	Where: 
+	Where:
 	i * m = n
 	i, m > 0
 	0 <= j <= m - 1
@@ -98,57 +94,55 @@ def calculateIndividualMVals(n):
 	x3 = m
 	"""
 
-	m = [[0, 0], [0, 0]]
-
 	solutions = []
 
 	for x3 in range(0, n + 1):
 		for x1 in range(0, n + 1):
 			for x2 in range(0, n + 1):
 				if ((x1 * x3 == n) and (x2 <= (x3 - 1))):
-					solutions.append([[x1, x2], [0,x3]])
+					solutions.append([[x1, x2], [0, x3]])
 
 	return solutions
 
-# -------------------------------------------------------------------------------
 
 def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
 	"""
 	STEP 4
-	Tests sets of testMatrices to determine which matrixes result in the smallest difference between lattice1 and lattice2
+	Tests sets of testMatrices to determine which matrixes result
+	in the smallest difference between lattice1 and lattice2
 	Determines which angle has the smallest difference in superlattices
 	"""
 
-	# Large error that the first comparison will likely be set to, making it set the first set as the best
+	# Large initial error to compare against
 	smallestErr = 1000000
 
 	# Iterates to test each pair of m and n matrices for lowest error
 	for m in mMatrices:
 		for n in nMatrices:
-			for theta in range(0,360):
+			for theta in range(0, 360):
 				# Temp matrix to test counterclockwise rotation
 
-				# Represents the crystal after lattices have undergone transformations to be close 
+				# Represents the crystal after lattices have undergone transformations
 				transformedL1 = np.dot(lattice1, n)
 				transformedL2 = np.dot(lattice2, m)
 
 				radianTheta = np.radians(theta)
 
-				rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)], \
-				[np.sin(radianTheta), np.cos(radianTheta)]]
+				rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)],
+						[np.sin(radianTheta), np.cos(radianTheta)]]
 
-				# Applies rotation matrix to L1 
+				# Applies rotation matrix to L1
 				transformedL1 = np.dot(transformedL1, rotation)
 
 				# Calculates the root mean square difference between matrices
-				diff = np.sqrt(((transformedL2[0][0] - transformedL1[0][0]) ** 2) + \
-				((transformedL2[0][1] - transformedL1[0][1]) ** 2) + \
-				((transformedL2[1][0] - transformedL1[1][0]) ** 2) + \
-				((transformedL2[1][1] - transformedL1[1][1]) ** 2))
+				diff = np.sqrt(((transformedL2[0][0] - transformedL1[0][0]) ** 2)
+						+ ((transformedL2[0][1] - transformedL1[0][1]) ** 2)
+						+ ((transformedL2[1][0] - transformedL1[1][0]) ** 2)
+						+ ((transformedL2[1][1] - transformedL1[1][1]) ** 2))
 
 				# Updates the best set of transformations if current set has smaller diff
-				if (diff < smallestErr): 
+				if (diff < smallestErr):
 					smallestErr = diff
 					bestM = m
 					bestN = n
@@ -156,7 +150,6 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
 	return [bestM, bestN, bestR, smallestErr]
 
-# -------------------------------------------------------------------------------
 
 def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 
@@ -169,9 +162,9 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 	n = acceptableMatrices[1]
 	theta = acceptableMatrices[2]
 
-	# Calculates the rotation matrix 
+	# Calculates the rotation matrix
 	radianTheta = np.radians(theta)
-	rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)], \
+	rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)],
 				[np.sin(radianTheta), np.cos(radianTheta)]]
 
 	# Calculates the superlattices that will be plotted
@@ -179,19 +172,19 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 	transformedL2 = np.dot(lattice2, m)
 
 	# Sets the points of the parallelogram created by transformedL1
-	p11 = [0,0]
 	p12 = [transformedL1[0][0], transformedL1[0][1]]
-	p13 = [transformedL1[0][0] + transformedL1[1][0], transformedL1[0][1] + transformedL1[1][1]]
+	p13 = [transformedL1[0][0] + transformedL1[1][0],
+			transformedL1[0][1] + transformedL1[1][1]]
 	p14 = [transformedL1[1][0], transformedL1[1][1]]
-	
+
 	# Creates lists of the x and y points of L1
 	l1XPoints = [0, p12[0], p13[0], p14[0]]
 	l1YPoints = [0, p12[1], p13[1], p14[1]]
 
 	# Sets the points of the parallelogram created by transformedL2
-	p21 = [0,0]
 	p22 = [transformedL2[0][0], transformedL2[0][1]]
-	p23 = [transformedL2[0][0] + transformedL2[1][0], transformedL2[0][1] + transformedL2[1][1]]
+	p23 = [transformedL2[0][0] + transformedL2[1][0],
+			transformedL2[0][1] + transformedL2[1][1]]
 	p24 = [transformedL2[1][0], transformedL2[1][1]]
 
 	# Creates lists of the x and y points of L2
@@ -206,13 +199,13 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 	# Sets the minimum and maximum y boundaries for graph
 	allYPoints = l1YPoints + l2YPoints
 	minY = min(allYPoints) * 1.1
-	maxY = max(allYPoints) * 1.1 
+	maxY = max(allYPoints) * 1.1
 
 	# If the min x or Y val is 0, add margin to graph
-	if (minX == 0): 
+	if (minX == 0):
 		minX = minX - 0.1 * maxX
 
-	if (minY == 0): 
+	if (minY == 0):
 		minY = minY - 0.1 * maxY
 
 	# Set up superlattice graph
@@ -223,36 +216,36 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 	ax.set_ylabel('Y axis (Angstroms)')
 
 	# Set graph boundaries
-	plt.xlim([minX,maxX])
-	plt.ylim([minY,maxY])
-	
+	plt.xlim([minX, maxX])
+	plt.ylim([minY, maxY])
+
 	# Graph superlattice 1
-	ax.add_patch(patches.Polygon(xy=list(zip(l1XPoints,l1YPoints)), fill = False, color = 'red', linewidth = 2))
+	ax.add_patch(patches.Polygon(xy=list(zip(l1XPoints, l1YPoints)),
+		fill=False, color='red', linewidth=2))
 
 	# Graph superlattice 2
-	ax.add_patch(patches.Polygon(xy=list(zip(l2XPoints,l2YPoints)), fill = False, color = 'blue', linewidth = 2))
+	ax.add_patch(patches.Polygon(xy=list(zip(l2XPoints, l2YPoints)),
+		fill=False, color='blue', linewidth=2))
 
 	plt.show()
 
 
-
-# -------------------------------------------------------------------------------
-
 def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 
 	"""
-	Calculates the transformations and re-orientations required to transform from a1, b1 to a2, b2
+	Calculates the transformations and re-orientations
+	required to transform from a1, b1 to a2, b2
 
 	a(i) and b(i) are vectors that form 2d lattice of a single crystal
 	| ai[1] ai[2] |
 	| bi[1] bi[2] |
 
 	Intended formula:
-	  L2    =    M      *   L1 - is a square matrix so might be able to take inverse
+	L2 = M * L1 - is a square matrix so might be able to take inverse
 	| a2 | = | i j | * | a1 |
-	| b2 |   | 0 m |   | b1 |
+	| b2 | = | 0 m | * | b1 |
 
-	Where: 
+	Where:
 	i * m = n
 	i, m > 0
 	0 <= j <= m - 1
@@ -281,11 +274,11 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 	ratio = calculateAreaRatio(lattice1, lattice2)
 
 	# STEP 2
-	# Calculates the integer ratio with 
+	# Calculates the integer ratio of areas
 	nVals = rationalizeRatio(ratio, maxN, maxErr)
 
 	# STEP 3
-	# Calculate the possible M matrices given 
+	# Calculate the possible M matrices
 	# mMatrices: matrices to multiply lattice2 by
 	# nMatrices: matrices to multiply lattice1 by
 	mMatrices = calculateIndividualMVals(nVals[0])
@@ -293,16 +286,15 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 
 	# STEP 4
 	# Determine which matrix set has the lowest error
-	acceptableMatrices = determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices)
+	acceptableMatrices = determineBestMatrix(lattice1,
+		lattice2, mMatrices, nMatrices)
 
-	#STEP 5
+	# STEP 5
 	# Graph the acceptableMatrices results
 	graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals)
 
 	return acceptableMatrices
-	
 
-# -------------------------------------------------------------------------------
 
 print("Testing lattice_transformations()")
 print()
@@ -310,21 +302,29 @@ print()
 maxN = 20
 maxErr = 0.01
 
-print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]], maxN, maxErr)))
+# print("Testing identical lattices: " + str(latticeTransformations
+# 	([[1, 0], [0, 1]], [[1, 0], [0, 1]], maxN, maxErr)))
 
-# print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]], maxN, maxErr)))
+# print("Testing 2x Lattice: " + str(latticeTransformations
+# 	([[1, 0], [0, 1]], [[2, 0], [0, 2]], maxN, maxErr)))
 
-# print("Testing 2x Lattice with 90 deg rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,-2], [2,0]], maxN, maxErr)))
+# print("Testing 2x Lattice with 90 deg rotation "
+# 	+ str(latticeTransformations([[1, 0], [0, 1]], [[0, -2], [2, 0]], maxN, maxErr)))
 
-# print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]], maxN, maxErr)))
+# print("Testing 3x Lattices: " + str(latticeTransformations
+# 	([[1, 0], [0, 1]], [[3, 0], [0, 3]], maxN, maxErr)))
 
-# print("Testing 3x Lattice with  90 deg rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-3], [3,0]], maxN, maxErr)))
+# print("Testing 3x Lattice with 90 deg rotation: " +
+# 	str(latticeTransformations([[1, 0], [0, 1]], [[0, -3], [3, 0]], maxN, maxErr)))
 
-# print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]], maxN, maxErr)))
+# print("Testing 4x Lattices: " + str(latticeTransformations
+# 	([[1, 0], [0, 1]], [[4, 0], [0, 4]], maxN, maxErr)))
 
-# print("Testing Non-rectangular Lattice2: " + str(lattice_transformations([[1,0], [0,4]], [[1,0], [0,4]], maxN, maxErr)))
+# print("Testing Non-rectangular Lattice2: "
+# 	+ str(latticeTransformations([[1, 0], [0, 4]], [[1, 0], [0, 4]], maxN, maxErr)))
 
-# print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-4], [4,0]], maxN, maxErr)))
+# print("Testing 4x Lattice with rotation: "
+# 	+ str(latticeTransformations([[1, 0], [0, 1]], [[0, -4], [4, 0]], maxN, maxErr)))
 
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
@@ -343,15 +343,20 @@ lengthHgBrN_1 = 4.02
 lengthHgBrN_2 = 4.46
 lengthSbTe3 = 4.32
 
-# print("Testing GaAs and CdTe: " + str(latticeTransformations([[lengthGaAs,0], [0,lengthGaAs]], [[lengthCdTe,0], [0,lengthCdTe]], maxN, maxErr)))
+# print("Testing GaAs and CdTe: " + str(latticeTransformations([[lengthGaAs, 0],
+# 	[0, lengthGaAs]], [[lengthCdTe, 0], [0, lengthCdTe]], maxN, maxErr)))
 
-# print("Testing Ga to LiMg: " + str(latticeTransformations([[lengthGa,0], [0,lengthGa]], [[lengthLiMg,0], [0,lengthLiMg]], maxN, maxErr)))
+# print("Testing Ga to LiMg: " + str(latticeTransformations([[lengthGa, 0],
+# 	[0, lengthGa]], [[lengthLiMg, 0], [0, lengthLiMg]], maxN, maxErr)))
 
-print("Testing Ga to Sb2Te3: " + str(latticeTransformations([[lengthGa,0], [0,lengthGa]], [[lengthSbTe3,0], [0,lengthSbTe3]], maxN, maxErr)))
+# print("Testing Ga to Sb2Te3: " + str(latticeTransformations([[lengthGa, 0],
+# 	[0, lengthGa]], [[lengthSbTe3, 0], [0, lengthSbTe3]], maxN, maxErr)))
 
-# print("Testing LiMg to Sb2Te3: " + str(latticeTransformations([[lengthLiMg,0], [0,lengthLiMg]], [[lengthSbTe3,0], [0,lengthSbTe3]], maxN, maxErr)))
+# print("Testing LiMg to Sb2Te3: " + str(latticeTransformations([[lengthLiMg, 0],
+# 	[0, lengthLiMg]], [[lengthSbTe3, 0], [0, lengthSbTe3]], maxN, maxErr)))
 
-# print("Testing 1 Angstrom to HgBrN: " + str(latticeTransformations([[1,0], [0,1]], [[lengthHgBrN_1,0], [0,lengthHgBrN_2]], maxN, maxErr)))
+# print("Testing 1 Angstrom to HgBrN: " + str(latticeTransformations([[1, 0],
+# 	[0, 1]], [[lengthHgBrN_1, 0], [0, lengthHgBrN_2]], maxN, maxErr)))
 
 # print("----------------")
 # print()
@@ -403,10 +408,3 @@ print("Testing Ga to Sb2Te3: " + str(latticeTransformations([[lengthGa,0], [0,le
 # originalL2 = [[lengthSbTe3,0], [0,lengthSbTe3]]
 # newL2 = np.dot(originalL2, rotation)
 # print("Ga vs SbTe3 with 25 degree rotation: " + str(latticeTransformations([[lengthGa,0], [0,lengthGa]], newL2, maxN, maxErr)))
-
-
-
-
-
-
-
