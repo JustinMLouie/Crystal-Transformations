@@ -16,7 +16,6 @@ def calculateAreaRatio(lattice1, lattice2):
 	"""
 
 	# Lattice 1 area calculations
-	#np.linalg.det() - google this to figure out how to get area and take abs of it
 	area1 = np.linalg.norm(abs(np.cross(lattice1[0], lattice1[1])))
 
 	# Lattice 2 area calculations 
@@ -97,7 +96,6 @@ def calculateIndividualMVals(n):
 	x1 = i
 	x2 = j
 	x3 = m
-
 	"""
 
 	m = [[0, 0], [0, 0]]
@@ -135,44 +133,19 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 				transformedL1 = np.dot(lattice1, n)
 				transformedL2 = np.dot(lattice2, m)
 
-				# print("-------------------------------------------------")
-
-
-				# print("m: " + str(m))
-				# print("n: " + str(n))
-
-				# print("lattice1: " + str(lattice1))
-				# print("lattice2: " + str(lattice2))
-
-				# print("pre-rotation transformedL1: " + str(transformedL1))
-				# print("pre-rotation transformedL2: " + str(transformedL2))
-
 				radianTheta = np.radians(theta)
 
 				rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)], \
 				[np.sin(radianTheta), np.cos(radianTheta)]]
 
-				# print("Theta: " + str(theta) + " | radians: " + str(radianTheta))
-
-				# print("Rotation")
-				# print(rotation)
-
 				# Applies rotation matrix to L1 
 				transformedL1 = np.dot(transformedL1, rotation)
-				# print("Rotated transformedL1")
-				# print(transformedL1)
-
-				# print("transformedL2")
-				# print(transformedL2)
 
 				# Calculates the root mean square difference between matrices
 				diff = np.sqrt(((transformedL2[0][0] - transformedL1[0][0]) ** 2) + \
 				((transformedL2[0][1] - transformedL1[0][1]) ** 2) + \
 				((transformedL2[1][0] - transformedL1[1][0]) ** 2) + \
 				((transformedL2[1][1] - transformedL1[1][1]) ** 2))
-
-				# print("theta: " + str(theta) + " | diff: " + str(diff) + " | smallestErr: " + str(smallestErr))
-				# print("")
 
 				# Updates the best set of transformations if current set has smaller diff
 				if (diff < smallestErr): 
@@ -187,6 +160,11 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
 def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 
+	"""
+	STEP 5
+	Graphs the superlattices imposed on each other
+	"""
+
 	m = acceptableMatrices[0]
 	n = acceptableMatrices[1]
 	theta = acceptableMatrices[2]
@@ -200,66 +178,58 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 	transformedL1 = np.dot(np.dot(lattice1, n), rotation)
 	transformedL2 = np.dot(lattice2, m)
 
-	
-
+	# Sets the points of the parallelogram created by transformedL1
 	p11 = [0,0]
 	p12 = [transformedL1[0][0], transformedL1[0][1]]
 	p13 = [transformedL1[0][0] + transformedL1[1][0], transformedL1[0][1] + transformedL1[1][1]]
 	p14 = [transformedL1[1][0], transformedL1[1][1]]
 	
-
+	# Creates lists of the x and y points of L1
 	l1XPoints = [0, p12[0], p13[0], p14[0]]
 	l1YPoints = [0, p12[1], p13[1], p14[1]]
 
-	# print("l1XPoints: " + str(l1XPoints))
-	# print("l1YPoints: " + str(l1YPoints))
-
+	# Sets the points of the parallelogram created by transformedL2
 	p21 = [0,0]
 	p22 = [transformedL2[0][0], transformedL2[0][1]]
 	p23 = [transformedL2[0][0] + transformedL2[1][0], transformedL2[0][1] + transformedL2[1][1]]
 	p24 = [transformedL2[1][0], transformedL2[1][1]]
 
+	# Creates lists of the x and y points of L2
 	l2XPoints = [0, p22[0], p23[0], p24[0]]
 	l2YPoints = [0, p22[1], p23[1], p24[1]]
 
-	# print("l2XPoints: " + str(l2XPoints))
-	# print("l2YPoints: " + str(l2YPoints))
-
-	fig, ax = plt.subplots()
-
+	# Sets the minimum and maximum x boundaries for graph
 	allXPoints = l1XPoints + l2XPoints
-	# print("allXPoints: " + str(allXPoints))
-
 	minX = min(allXPoints) * 1.1
-	# print("minX = " + str(minX))
-
 	maxX = max(allXPoints) * 1.1
-	# print("maxX = " + str(maxX))
 
+	# Sets the minimum and maximum y boundaries for graph
 	allYPoints = l1YPoints + l2YPoints
-	# print("allYPoints: " + str(allYPoints))
-
 	minY = min(allYPoints) * 1.1
-	# print("minY = " + str(minY))
-
 	maxY = max(allYPoints) * 1.1 
-	# print("maxY = " + str(maxY))
 
+	# If the min x or Y val is 0, add margin to graph
 	if (minX == 0): 
 		minX = minX - 0.1 * maxX
 
 	if (minY == 0): 
 		minY = minY - 0.1 * maxY
 
+	# Set up superlattice graph
+	fig, ax = plt.subplots()
 	plt.grid(True)
 	plt.title("Superlattice Mismatch")
 	ax.set_xlabel('X axis (Angstroms)')
 	ax.set_ylabel('Y axis (Angstroms)')
 
+	# Set graph boundaries
 	plt.xlim([minX,maxX])
 	plt.ylim([minY,maxY])
 	
+	# Graph superlattice 1
 	ax.add_patch(patches.Polygon(xy=list(zip(l1XPoints,l1YPoints)), fill = False, color = 'red', linewidth = 2))
+
+	# Graph superlattice 2
 	ax.add_patch(patches.Polygon(xy=list(zip(l2XPoints,l2YPoints)), fill = False, color = 'blue', linewidth = 2))
 
 	plt.show()
@@ -334,100 +304,10 @@ def lattice_transformations(lattice1, lattice2, maxN, maxErr):
 
 # -------------------------------------------------------------------------------
 
-# # Unit tests for calculateAreaRatio()
-# print("Testing calculateAreaRatio()")
-# print()
-
-# Test of 1 to 1
-# print("Identical Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[1,0], [0,1]])))
-# print("Flipped Lattices: " + str(calculateAreaRatio([[1,0], [0,1]], [[0,1], [1,0]])))
-
-
-# # Test 9/4 = 5.6025
-# print("Testing 9/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9,0], [0,9]])))
-
-# # Testing non-integer ratios
-# print("Testing 9.1/4: " + str(calculateAreaRatio([[4,0], [0,4]], [[9.1,0], [0,9.1]])))
-
-# # GaAs: a = 5.653
-# # CdTe: a = 6.481
-# # Ratio should be 1.314
-# print("GaAs and CdTe ratio: " + str(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]])))
-
-# print("----------------")
-
-# Unit tests for rationalizeRatio()
-# print("Testing rationalizeRatio()")
-# print()
-
-# Testing known number ratios
-# print("1/2: " + str(rationalizeRatio(0.500, 1000)))
-# print("1/3: " + str(rationalizeRatio(0.3333333, 1000)))
-# print("2/3: " + str(rationalizeRatio(0.6666667, 1000)))
-# print("1/4: " + str(rationalizeRatio(0.25, 1000)))
-# print("1/1: " + str(rationalizeRatio(1.000, 1000)))
-
-# print()
-
-# # Testing GaAs and CdTe
-# print("Testing GaAs and CdTe: " + str(rationalizeRatio(calculateAreaRatio([[5.653,0], [0,5.653]], [[6.481,0], [0,6.481]]), 1000)))
-# print("Testing 1.314: " + str(rationalizeRatio(1.314395525, 1000)))
-# print("Testing 0.760: " + str(rationalizeRatio(0.7608059984, 1000)))
-
-# print()
-
-# # Testing known irrational numbers
-# print("Testing pi: " + str(rationalizeRatio(math.pi , 1000)))
-# print("Testing e:" + str(rationalizeRatio(math.e, 1000)))
-# print("Testing sqrt(2):" + str(rationalizeRatio(math.sqrt(2), 1000)))
-
-# print("----------------")
-
-# Unit tests for calculateM()
-# print("Testing calculateIndividualMVals()")
-# print()
-
-# print("n = 0: " + str(calculateIndividualMVals(0)))
-# print()
-
-# print("n = 1: " + str(calculateIndividualMVals(1)))
-# print()
-
-# print("n = 2: " + str(calculateIndividualMVals(2)))
-# print()
-
-# print("n = 3: " + str(calculateIndividualMVals(3)))
-# print()
-
-# print("n = 4: " + str(calculateIndividualMVals(4)))
-# print()
-
-# print("n = 5: " + str(calculateIndividualMVals(5)))
-# print()
-
-# print("n = 6: " + str(calculateIndividualMVals(6)))
-# print()
-
-# print("----------------")
-
-# print("Testing calculateAllMVals()")
-# print()
-
-# print("Set 0,1: " + str(calculateAllMVals([0,1])))
-
-# print("Set 1,2: " + str(calculateAllMVals([1,2])))
-
-# # The n values used for CdTe GaAs example, provides same outpouts
-# print("Set 3,4: " + str(calculateAllMVals([3,4])))
-
-# print("----------------")
-# print()
-
-
 print("Testing lattice_transformations()")
 print()
 
-maxN = 1000
+maxN = 20
 maxErr = 0.01
 
 print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]], maxN, maxErr)))
@@ -480,66 +360,48 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 # print()
 
 # angle = np.radians(30)
-
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-
 # print("30 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation, , maxN, maxErr)))
 
 # #---------
 
 # angle = np.radians(40)
-
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-
 # print("40 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation, , maxN, maxErr)))
 
 # #---------
 
 # angle = np.radians(45)
-
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-
 # originalL2 = [[2,0], [0,2]]
-
 # newL2 = np.dot(originalL2, rotation)
-
 # print("45 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2, maxN, maxErr)))
 
 # #---------
 
 # angle = np.radians(60)
-
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-
 # originalL2 = [[2,0], [0,2]]
-
 # newL2 = np.dot(originalL2, rotation)
-
 # print("60 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2, maxN, maxErr)))
 
 # # ---------
 
 # angle = np.radians(25)
-
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-
 # originalL2 = [[2,0], [0,2]]
-
 # newL2 = np.dot(originalL2, rotation)
-
 # print("25 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2, maxN, maxErr)))
+
+# # ---------
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
 
 # angle = np.radians(25)
-
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-
 # originalL2 = [[lengthSbTe3,0], [0,lengthSbTe3]]
-
 # newL2 = np.dot(originalL2, rotation)
-
 # print("Ga vs SbTe3 with 25 degree rotation: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], newL2, maxN, maxErr)))
 
 
