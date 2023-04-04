@@ -1,6 +1,8 @@
 import numpy as np
 import math
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+
 
 
 def calculateAreaRatio(lattice1, lattice2):
@@ -183,6 +185,89 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
 # -------------------------------------------------------------------------------
 
+def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
+
+	m = acceptableMatrices[0]
+	n = acceptableMatrices[1]
+	theta = acceptableMatrices[2]
+
+	# Calculates the rotation matrix 
+	radianTheta = np.radians(theta)
+	rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)], \
+				[np.sin(radianTheta), np.cos(radianTheta)]]
+
+	# Calculates the superlattices that will be plotted
+	transformedL1 = np.dot(np.dot(lattice1, n), rotation)
+	transformedL2 = np.dot(lattice2, m)
+
+	
+
+	p11 = [0,0]
+	p12 = [transformedL1[0][0], transformedL1[0][1]]
+	p13 = [transformedL1[0][0] + transformedL1[1][0], transformedL1[0][1] + transformedL1[1][1]]
+	p14 = [transformedL1[1][0], transformedL1[1][1]]
+	
+
+	l1XPoints = [0, p12[0], p13[0], p14[0]]
+	l1YPoints = [0, p12[1], p13[1], p14[1]]
+
+	# print("l1XPoints: " + str(l1XPoints))
+	# print("l1YPoints: " + str(l1YPoints))
+
+	p21 = [0,0]
+	p22 = [transformedL2[0][0], transformedL2[0][1]]
+	p23 = [transformedL2[0][0] + transformedL2[1][0], transformedL2[0][1] + transformedL2[1][1]]
+	p24 = [transformedL2[1][0], transformedL2[1][1]]
+
+	l2XPoints = [0, p22[0], p23[0], p24[0]]
+	l2YPoints = [0, p22[1], p23[1], p24[1]]
+
+	# print("l2XPoints: " + str(l2XPoints))
+	# print("l2YPoints: " + str(l2YPoints))
+
+	fig, ax = plt.subplots()
+
+	allXPoints = l1XPoints + l2XPoints
+	# print("allXPoints: " + str(allXPoints))
+
+	minX = min(allXPoints) * 1.1
+	# print("minX = " + str(minX))
+
+	maxX = max(allXPoints) * 1.1
+	# print("maxX = " + str(maxX))
+
+	allYPoints = l1YPoints + l2YPoints
+	# print("allYPoints: " + str(allYPoints))
+
+	minY = min(allYPoints) * 1.1
+	# print("minY = " + str(minY))
+
+	maxY = max(allYPoints) * 1.1 
+	# print("maxY = " + str(maxY))
+
+	if (minX == 0): 
+		minX = minX - 0.1 * maxX
+
+	if (minY == 0): 
+		minY = minY - 0.1 * maxY
+
+	plt.grid(True)
+	plt.title("Superlattice Mismatch")
+	ax.set_xlabel('X axis (Angstroms)')
+	ax.set_ylabel('Y axis (Angstroms)')
+
+	plt.xlim([minX,maxX])
+	plt.ylim([minY,maxY])
+	
+	ax.add_patch(patches.Polygon(xy=list(zip(l1XPoints,l1YPoints)), fill = False, color = 'red', linewidth = 2))
+	ax.add_patch(patches.Polygon(xy=list(zip(l2XPoints,l2YPoints)), fill = False, color = 'blue', linewidth = 2))
+
+	plt.show()
+
+
+
+# -------------------------------------------------------------------------------
+
 def lattice_transformations(lattice1, lattice2):
 
 	"""
@@ -234,7 +319,6 @@ def lattice_transformations(lattice1, lattice2):
 	# Calculates the integer ratio with 
 	nVals = rationalizeRatio(ratio, 1000)
 
-
 	# STEP 3
 	# Calculate the possible M matrices given 
 	# mMatrices: matrices to multiply lattice2 by
@@ -246,11 +330,12 @@ def lattice_transformations(lattice1, lattice2):
 	# Determine which matrix set has the lowest error
 	acceptableMatrices = determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices)
 
+	#STEP 5
+	# Graph the acceptableMatrices results
+	graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals)
+
 	return acceptableMatrices
 	
-	# TODO: Figure out which set of the x1 x2 and x3 is the best transformation
-
-# Future final test case for overall script
 
 # -------------------------------------------------------------------------------
 
@@ -343,20 +428,6 @@ def lattice_transformations(lattice1, lattice2):
 # print("----------------")
 # print()
 
-# print("Testing calculatePercentError()")
-# print()
-
-# Standard test with simple numbers easy to calculate with
-# print(calculatePercentError([[1,0], [0,1]], [[2,0], [0,2]], [[1, 0], [0, 1]], [[2, 0], [0, 2]]))
-
-# Testing lattice matrix 
-# print(calculatePercentError([[1,0], [0,1]], [[0,1], [1,0]], [[1, 0], [0, 1]]))
-
-# Testing a case with an acceptable erro
-# print(calculatePercentError([[1,0], [0,1]], [[1.001,0], [0,1.001]], [[1, 0], [0, 1]]))
-
-# print("----------------")
-# print()
 
 print("Testing lattice_transformations()")
 print()
@@ -394,15 +465,15 @@ lengthHgBrN_1 = 4.02
 lengthHgBrN_2 = 4.46
 lengthSbTe3 = 4.32
 
-print("Testing GaAs and CdTe: " + str(lattice_transformations([[lengthGaAs,0], [0,lengthGaAs]], [[lengthCdTe,0], [0,lengthCdTe]])))
+# print("Testing GaAs and CdTe: " + str(lattice_transformations([[lengthGaAs,0], [0,lengthGaAs]], [[lengthCdTe,0], [0,lengthCdTe]])))
 
-print("Testing Ga to LiMg: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthLiMg,0], [0,lengthLiMg]])))
+# print("Testing Ga to LiMg: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthLiMg,0], [0,lengthLiMg]])))
 
 print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
 
-print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[lengthLiMg,0], [0,lengthLiMg]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
+# print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[lengthLiMg,0], [0,lengthLiMg]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
 
-print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[lengthHgBrN_1,0], [0,lengthHgBrN_2]])))
+# print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[lengthHgBrN_1,0], [0,lengthHgBrN_2]])))
 
 # print("----------------")
 # print()
@@ -463,16 +534,16 @@ print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
 
-angle = np.radians(25)
+# angle = np.radians(25)
 
-rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
+# rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
 
-originalL2 = [[lengthSbTe3,0], [0,lengthSbTe3]]
+# originalL2 = [[lengthSbTe3,0], [0,lengthSbTe3]]
 
-newL2 = np.dot(originalL2, rotation)
+# newL2 = np.dot(originalL2, rotation)
 
 
-print("Ga vs SbTe3 with 25 degree rotation: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], newL2)))
+# print("Ga vs SbTe3 with 25 degree rotation: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], newL2)))
 
 
 
