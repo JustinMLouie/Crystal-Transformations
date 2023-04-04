@@ -256,9 +256,7 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 	r2 = int, number of cells in supercell lattice2
 
 	Output:
-	M =
-	| x1 x2 |
-	| 0  x3 |
+	M = [[x1, x2], [0, x3]]
 	"""
 
 	# List of sets of n values that create the area ratios
@@ -296,8 +294,8 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 	return acceptableMatrices
 
 
-print("Testing lattice_transformations()")
-print()
+# print("Testing lattice_transformations()")
+# print()
 
 maxN = 20
 maxErr = 0.01
