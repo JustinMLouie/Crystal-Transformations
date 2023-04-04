@@ -29,7 +29,7 @@ def calculateAreaRatio(lattice1, lattice2):
 
 # -------------------------------------------------------------------------------
 
-def rationalizeRatio(ratio, N):
+def rationalizeRatio(ratio, N, maxErr):
 	"""
 	STEP 2
 	Calculates a set of numbers that form a rational number with a ratio
@@ -54,8 +54,8 @@ def rationalizeRatio(ratio, N):
 
 	while (b <= N and d <= N):
 		mediant = float(a+c)/(b+d)
-		# checks if it is within the 1% accepted error
-		if (abs(ratio - mediant)/ratio <= 0.01):
+		# checks if it is within the user input accepted error
+		if (abs(ratio - mediant)/ratio <= maxErr):
 			if b + d <= N:
 				return a+c, b+d
 			elif d > b:
@@ -268,7 +268,7 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
 
 # -------------------------------------------------------------------------------
 
-def lattice_transformations(lattice1, lattice2):
+def lattice_transformations(lattice1, lattice2, maxN, maxErr):
 
 	"""
 	Calculates the transformations and re-orientations required to transform from a1, b1 to a2, b2
@@ -298,11 +298,6 @@ def lattice_transformations(lattice1, lattice2):
 	| 0  x3 |
 	"""
 
-	# Define the initial and final lattices
-
-	# Primative lattice transformations
-	transformations = np.zeros((2,2))
-
 	# List of sets of n values that create the area ratios
 	nVals = []
 
@@ -317,7 +312,7 @@ def lattice_transformations(lattice1, lattice2):
 
 	# STEP 2
 	# Calculates the integer ratio with 
-	nVals = rationalizeRatio(ratio, 1000)
+	nVals = rationalizeRatio(ratio, maxN, maxErr)
 
 	# STEP 3
 	# Calculate the possible M matrices given 
@@ -432,21 +427,24 @@ def lattice_transformations(lattice1, lattice2):
 print("Testing lattice_transformations()")
 print()
 
-# print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]])))
+maxN = 1000
+maxErr = 0.01
 
-# print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]])))
+print("Testing identical lattices: " + str(lattice_transformations([[1,0], [0,1]], [[1,0], [0,1]], maxN, maxErr)))
 
-# print("Testing 2x Lattice with 90 deg rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,-2], [2,0]])))
+# print("Testing 2x Lattice: " + str(lattice_transformations([[1,0], [0,1]], [[2,0], [0,2]], maxN, maxErr)))
 
-# print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]])))
+# print("Testing 2x Lattice with 90 deg rotation " + str(lattice_transformations([[1,0], [0,1]], [[0,-2], [2,0]], maxN, maxErr)))
 
-# print("Testing 3x Lattice with  90 deg rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-3], [3,0]])))
+# print("Testing 3x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[3,0], [0,3]], maxN, maxErr)))
 
-# print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]])))
+# print("Testing 3x Lattice with  90 deg rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-3], [3,0]], maxN, maxErr)))
 
-# print("Testing Non-rectangular Lattice2: " + str(lattice_transformations([[1,0], [0,4]], [[1,0], [0,4]])))
+# print("Testing 4x Lattices: " + str(lattice_transformations([[1,0], [0,1]], [[4,0], [0,4]], maxN, maxErr)))
 
-# print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-4], [4,0]])))
+# print("Testing Non-rectangular Lattice2: " + str(lattice_transformations([[1,0], [0,4]], [[1,0], [0,4]], maxN, maxErr)))
+
+# print("Testing 4x Lattice with rotation: " + str(lattice_transformations([[1,0], [0,1]], [[0,-4], [4,0]], maxN, maxErr)))
 
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
@@ -465,15 +463,15 @@ lengthHgBrN_1 = 4.02
 lengthHgBrN_2 = 4.46
 lengthSbTe3 = 4.32
 
-# print("Testing GaAs and CdTe: " + str(lattice_transformations([[lengthGaAs,0], [0,lengthGaAs]], [[lengthCdTe,0], [0,lengthCdTe]])))
+# print("Testing GaAs and CdTe: " + str(lattice_transformations([[lengthGaAs,0], [0,lengthGaAs]], [[lengthCdTe,0], [0,lengthCdTe]], maxN, maxErr)))
 
-# print("Testing Ga to LiMg: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthLiMg,0], [0,lengthLiMg]])))
+# print("Testing Ga to LiMg: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthLiMg,0], [0,lengthLiMg]], maxN, maxErr)))
 
-print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
+print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], [[lengthSbTe3,0], [0,lengthSbTe3]], maxN, maxErr)))
 
-# print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[lengthLiMg,0], [0,lengthLiMg]], [[lengthSbTe3,0], [0,lengthSbTe3]])))
+# print("Testing LiMg to Sb2Te3: " + str(lattice_transformations([[lengthLiMg,0], [0,lengthLiMg]], [[lengthSbTe3,0], [0,lengthSbTe3]], maxN, maxErr)))
 
-# print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[lengthHgBrN_1,0], [0,lengthHgBrN_2]])))
+# print("Testing 1 Angstrom to HgBrN: " + str(lattice_transformations([[1,0], [0,1]], [[lengthHgBrN_1,0], [0,lengthHgBrN_2]], maxN, maxErr)))
 
 # print("----------------")
 # print()
@@ -485,7 +483,7 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
 
-# print("30 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation)))
+# print("30 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation, , maxN, maxErr)))
 
 # #---------
 
@@ -493,7 +491,7 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
 
-# print("40 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation)))
+# print("40 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], rotation, , maxN, maxErr)))
 
 # #---------
 
@@ -505,7 +503,7 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 
 # newL2 = np.dot(originalL2, rotation)
 
-# print("45 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2)))
+# print("45 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2, maxN, maxErr)))
 
 # #---------
 
@@ -517,7 +515,7 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 
 # newL2 = np.dot(originalL2, rotation)
 
-# print("60 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2)))
+# print("60 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2, maxN, maxErr)))
 
 # # ---------
 
@@ -529,7 +527,7 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 
 # newL2 = np.dot(originalL2, rotation)
 
-# print("25 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2)))
+# print("25 Degree Rotation: " + str(lattice_transformations([[1,0], [0,1]], newL2, maxN, maxErr)))
 
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2994 Ga: 2.66
 # http://www.2dmatpedia.org/2dmaterials/doc/2dm-2995 Sb2Te3: 4.32
@@ -542,8 +540,7 @@ print("Testing Ga to Sb2Te3: " + str(lattice_transformations([[lengthGa,0], [0,l
 
 # newL2 = np.dot(originalL2, rotation)
 
-
-# print("Ga vs SbTe3 with 25 degree rotation: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], newL2)))
+# print("Ga vs SbTe3 with 25 degree rotation: " + str(lattice_transformations([[lengthGa,0], [0,lengthGa]], newL2, maxN, maxErr)))
 
 
 
