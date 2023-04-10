@@ -135,11 +135,45 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 				# Applies rotation matrix to L1
 				transformedL1 = np.dot(transformedL1, rotation)
 
-				# Calculates the root mean square difference between matrices
-				diff = np.sqrt(((transformedL2[0][0] - transformedL1[0][0]) ** 2)
-						+ ((transformedL2[0][1] - transformedL1[0][1]) ** 2)
-						+ ((transformedL2[1][0] - transformedL1[1][0]) ** 2)
-						+ ((transformedL2[1][1] - transformedL1[1][1]) ** 2))
+				# Numerator = (L2[i][j] - L1[i][j])^2
+				numerator1 = (transformedL2[0][0] - transformedL1[0][0]) ** 2
+				numerator2 = (transformedL2[1][0] - transformedL1[1][0]) ** 2
+				numerator3 = (transformedL2[0][1] - transformedL1[0][1]) ** 2
+				numerator4 = (transformedL2[1][1] - transformedL1[1][1]) ** 2
+
+				# denominator = ((L2[i][j] + L1[i][j])/2)^2
+				denominator1 = ((transformedL2[0][0] + transformedL1[0][0]) / 2) ** 2
+				denominator2 = ((transformedL2[1][0] + transformedL1[1][0]) / 2) ** 2
+				denominator3 = ((transformedL2[0][1] + transformedL1[0][1]) / 2) ** 2
+				denominator4 = ((transformedL2[1][1] + transformedL1[1][1]) / 2) ** 2
+
+				"""
+				Difference in each matrix point
+				Takes the RMS of each matrix point
+				Divides RMS by the average of each matrix point squared
+				"""
+				if (denominator1 == 0):
+					diff1 = 0
+				else:
+					diff1 = numerator1 / denominator1
+
+				if (denominator2 == 0):
+					diff2 = 0
+				else:
+					diff2 = numerator2 / denominator2
+
+				if (denominator3 == 0):
+					diff3 = 0
+				else:
+					diff3 = numerator3 / denominator3
+
+				if (denominator4 == 0):
+					diff4 = 0
+				else:
+					diff4 = numerator4 / denominator4
+
+				# Final difference calculation
+				diff = np.sqrt(diff1 + diff2 + diff3 + diff4)
 
 				# Updates the best set of transformations if current set has smaller diff
 				if (diff < smallestErr):
@@ -364,13 +398,13 @@ lengthSbTe3 = 4.32
 
 # angle = np.radians(30)
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-# print("30 Degree Rotation: " + str(latticeTransformations([[1,0], [0,1]], rotation, , maxN, maxErr)))
+# print("30 Degree Rotation: " + str(latticeTransformations([[1,0], [0,1]], rotation, maxN, maxErr)))
 
 # #---------
 
 # angle = np.radians(40)
 # rotation = [[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]]
-# print("40 Degree Rotation: " + str(latticeTransformations([[1,0], [0,1]], rotation, , maxN, maxErr)))
+# print("40 Degree Rotation: " + str(latticeTransformations([[1,0], [0,1]], rotation, maxN, maxErr)))
 
 # #---------
 
