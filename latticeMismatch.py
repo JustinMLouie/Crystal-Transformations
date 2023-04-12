@@ -136,14 +136,15 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
                 # Applies rotation matrix to L1
                 transformedL1 = np.dot(transformedL1, rotation)
 
-                # Numerator = (L2[i][j] - L1[i][j])^2
-                diff1 = (transformedL2[0][0] - transformedL1[0][0]) ** 2
-                diff2 = (transformedL2[1][0] - transformedL1[1][0]) ** 2
-                diff3 = (transformedL2[0][1] - transformedL1[0][1]) ** 2
-                diff4 = (transformedL2[1][1] - transformedL1[1][1]) ** 2
+                diffMatrix = (transformedL2 - transformedL1) ** 2
 
-                # Final difference calculation
-                diff = np.sqrt(diff1 + diff2 + diff3 + diff4)
+                diff1 = diffMatrix[0][0]
+                diff2 = diffMatrix[0][1]
+                diff3 = diffMatrix[1][0]
+                diff4 = diffMatrix[1][1]
+
+                # Calculation of the RMS between the two matrices
+                diff = np.sqrt((diff1 + diff2 + diff3 + diff4)/4)
 
                 # Updates the best set of transformations
                 # if current set has smaller diff
@@ -152,7 +153,6 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
                     bestM = m
                     bestN = n
                     bestR = theta
-                    print(np.linalg.det(rotation))
 
     return [bestM, bestN, bestR, smallestErr]
 
@@ -306,11 +306,11 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 maxN = 20
 maxErr = 0.01
 
-# print("Testing identical lattices: " + str(latticeTransformations
-#   ([[1, 0], [0, 1]], [[1, 0], [0, 1]], maxN, maxErr)))
+print("Testing identical lattices: " + str(latticeTransformations
+  ([[1, 0], [0, 1]], [[1, 0], [0, 1]], maxN, maxErr)))
 
-# print("Testing 2x Lattice: " + str(latticeTransformations
-#   ([[1, 0], [0, 1]], [[2, 0], [0, 2]], maxN, maxErr)))
+print("Testing 2x Lattice: " + str(latticeTransformations
+  ([[1, 0], [0, 1]], [[2, 0], [0, 2]], maxN, maxErr)))
 
 # print("Testing 2x Lattice with 90 deg rotation "
 #   + str(latticeTransformations([[1, 0], [0, 1]], [[0, -2], [2, 0]], maxN, maxErr)))
@@ -350,24 +350,24 @@ lengthSbTe3 = 4.32
 print("Testing GaAs and CdTe: " + str(latticeTransformations([[lengthGaAs, 0],
   [0, lengthGaAs]], [[lengthCdTe, 0], [0, lengthCdTe]], maxN, maxErr)))
 
-# print("Testing Ga to LiMg: " + str(latticeTransformations([[lengthGa, 0],
-#   [0, lengthGa]], [[lengthLiMg, 0], [0, lengthLiMg]], maxN, maxErr)))
+print("Testing Ga to LiMg: " + str(latticeTransformations([[lengthGa, 0],
+  [0, lengthGa]], [[lengthLiMg, 0], [0, lengthLiMg]], maxN, maxErr)))
 
-# print("Testing Ga to Sb2Te3: " + str(latticeTransformations([[lengthGa, 0],
-#   [0, lengthGa]], [[lengthSbTe3, 0], [0, lengthSbTe3]], maxN, maxErr)))
+print("Testing Ga to Sb2Te3: " + str(latticeTransformations([[lengthGa, 0],
+  [0, lengthGa]], [[lengthSbTe3, 0], [0, lengthSbTe3]], maxN, maxErr)))
 
-# print("Testing LiMg to Sb2Te3: " + str(latticeTransformations([[lengthLiMg, 0],
-#   [0, lengthLiMg]], [[lengthSbTe3, 0], [0, lengthSbTe3]], maxN, maxErr)))
+print("Testing LiMg to Sb2Te3: " + str(latticeTransformations([[lengthLiMg, 0],
+  [0, lengthLiMg]], [[lengthSbTe3, 0], [0, lengthSbTe3]], maxN, maxErr)))
 
-# print("Testing 1 Angstrom to HgBrN: " + str(latticeTransformations([[1, 0],
-#   [0, 1]], [[lengthHgBrN_1, 0], [0, lengthHgBrN_2]], maxN, maxErr)))
+print("Testing 1 Angstrom to HgBrN: " + str(latticeTransformations([[1, 0],
+  [0, 1]], [[lengthHgBrN_1, 0], [0, lengthHgBrN_2]], maxN, maxErr)))
 
-# print("Testing 1 Angstrom to MoS2: " + str(latticeTransformations([[1, 0],
-#   [0, 1]], [[3.19622328, 0], [-1.59811164, 2.76800985]], maxN, maxErr)))
+print("Testing 1 Angstrom to MoS2: " + str(latticeTransformations([[1, 0],
+  [0, 1]], [[3.19622328, 0], [-1.59811164, 2.76800985]], maxN, maxErr)))
 
 # nice example for presentation
-print("Testing Graphene Angstrom to MoS2: " + str(latticeTransformations([[2.4, 0],
-  [-1.2, 2.078460969]], [[3.19622328, 0], [-1.59811164, 2.76800985]], maxN, maxErr)))
+# print("Testing Graphene Angstrom to MoS2: " + str(latticeTransformations([[2.4, 0],
+#   [-1.2, 2.078460969]], [[3.19622328, 0], [-1.59811164, 2.76800985]], maxN, maxErr)))
 
 # print("----------------")
 # print()
