@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from sys import argv
 
 
 def calculateAreaRatio(lattice1, lattice2):
@@ -343,48 +344,48 @@ lattSnSe2 = [[3.86639999, 0], [-1.93319999, 3.34840073]]
 lattWSe2 = [[3.33061865, 0], [-1.66530983, 2.88440009]]
 lattZrS2 = [[3.69092, 0], [-1.84546, 3.19643]]
 
-print("lattCdTe_100_012 vs lattGaAs_100_015: ")
-print(latticeTransformations(lattCdTe_100_012,
-    lattGaAs_100_015, maxN, maxErr))
-print()
+# print("lattCdTe_100_012 vs lattGaAs_100_015: ")
+# print(latticeTransformations(lattCdTe_100_012,
+#     lattGaAs_100_015, maxN, maxErr))
+# print()
 
-print("lattCdTe_100_015 vs lattGaAs_100_035: ")
-print(latticeTransformations(lattCdTe_100_015,
-    lattGaAs_100_035, maxN, maxErr))
-print()
+# print("lattCdTe_100_015 vs lattGaAs_100_035: ")
+# print(latticeTransformations(lattCdTe_100_015,
+#     lattGaAs_100_035, maxN, maxErr))
+# print()
 
-print("lattCdTe_111_121 vs lattGaAs_100_011: ")
-print(latticeTransformations(lattCdTe_111_121,
-    lattGaAs_100_011, maxN, maxErr))
-print()
+# print("lattCdTe_111_121 vs lattGaAs_100_011: ")
+# print(latticeTransformations(lattCdTe_111_121,
+#     lattGaAs_100_011, maxN, maxErr))
+# print()
 
-print("lattCdTe_100_011 vs lattGaAs_110_112: ")
-print(latticeTransformations(lattCdTe_100_011,
-    lattGaAs_110_112, maxN, maxErr))
-print()
+# print("lattCdTe_100_011 vs lattGaAs_110_112: ")
+# print(latticeTransformations(lattCdTe_100_011,
+#     lattGaAs_110_112, maxN, maxErr))
+# print()
 
-print("lattCdTe_100_015 vs lattGaAs_110_334: ")
-print(latticeTransformations(lattCdTe_100_015_2,
-    lattGaAs_110_334, maxN, maxErr))
-print()
+# print("lattCdTe_100_015 vs lattGaAs_110_334: ")
+# print(latticeTransformations(lattCdTe_100_015_2,
+#     lattGaAs_110_334, maxN, maxErr))
+# print()
 
-print("lattCdTe_110_112 vs lattGaAs_110_110: ")
-print(latticeTransformations(lattCdTe_110_112,
-    lattGaAs_110_110, maxN, maxErr))
-print()
+# print("lattCdTe_110_112 vs lattGaAs_110_110: ")
+# print(latticeTransformations(lattCdTe_110_112,
+#     lattGaAs_110_110, maxN, maxErr))
+# print()
 
-print("lattGraphene vs lattMoS2: ")
-print(latticeTransformations(lattGraphene,
-    lattMoS2, maxN, maxErr))
-print()
+# print("lattGraphene vs lattMoS2: ")
+# print(latticeTransformations(lattGraphene,
+#     lattMoS2, maxN, maxErr))
+# print()
 
-print("1T-SnSe2 vs 2H-WSe2: ")
-print(latticeTransformations(lattSnSe2,
-    lattWSe2, maxN, maxErr))
-print()
+# print("1T-SnSe2 vs 2H-WSe2: ")
+# print(latticeTransformations(lattSnSe2,
+#     lattWSe2, maxN, maxErr))
+# print()
 
-print("1T-ZrS2 vs 2H-WSe2: ")
-print(latticeTransformations(lattZrS2,
-    lattWSe2, maxN, maxErr))
-print()
+# print("1T-ZrS2 vs 2H-WSe2: ")
+# print(latticeTransformations(lattZrS2,
+#     lattWSe2, maxN, maxErr))
+# print()
 
