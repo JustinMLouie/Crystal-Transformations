@@ -311,7 +311,7 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 # print("Testing lattice_transformations()")
 # print()
 
-maxN = 10000
+maxN = 20
 maxErr = 0.01
 
 """
