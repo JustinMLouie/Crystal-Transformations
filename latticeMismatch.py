@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
+from sys import argv
 
 
 def calculateAreaRatio(lattice1, lattice2):
@@ -25,6 +26,16 @@ def calculateAreaRatio(lattice1, lattice2):
     return ratio
 
 
+def returnRatio(ratio, N, maxErr):
+    if (ratio > 1):
+        a, b = rationalizeRatio(1 / ratio, N, maxErr)
+        return b, a
+    elif(ratio == 1):
+        return 1, 1
+    else:
+        return rationalizeRatio(ratio, N, maxErr)
+
+
 def rationalizeRatio(ratio, N, maxErr):
     """
     STEP 2
@@ -37,16 +48,12 @@ def rationalizeRatio(ratio, N, maxErr):
     Maximum denominator = N
     """
 
+    assert ratio < 1
+
     a = 0
     b = 1
     c = 1
     d = 1
-
-    # Flip ratio if it is greater than 1 to fit rationalizeRatio
-    if (ratio > 1):
-        ratio = 1 / ratio
-    elif (ratio == 1):
-        return 1, 1
 
     while (b <= N and d <= N):
         mediant = float(a + c) / (b + d)
@@ -87,7 +94,7 @@ def calculateIndividualMVals(n):
     i * m = n
     i, m > 0
     0 <= j <= m - 1
-    n = integer number obtained from rationalizeRatio()
+    n = integer number obtained from returnRatio()
 
     x1 = i
     x2 = j
@@ -120,13 +127,13 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
     # Iterates to test each pair of m and n matrices for lowest error
     for m in mMatrices:
         for n in nMatrices:
-            for theta in range(0, 1):
+            for theta in np.linspace(0, 360, 3600):
                 # Temp matrix to test counterclockwise rotation
 
                 # Represents the crystal after
                 # lattices have undergone transformations
-                transformedL1 = np.dot(lattice1, n)
-                transformedL2 = np.dot(lattice2, m)
+                transformedL1 = np.dot(lattice1, m)
+                transformedL2 = np.dot(lattice2, n)
 
                 radianTheta = np.radians(theta)
 
@@ -174,8 +181,8 @@ def graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals):
                 [np.sin(radianTheta), np.cos(radianTheta)]]
 
     # Calculates the superlattices that will be plotted
-    transformedL1 = np.dot(np.dot(lattice1, n), rotation)
-    transformedL2 = np.dot(lattice2, m)
+    transformedL1 = np.dot(np.dot(lattice1, m), rotation)
+    transformedL2 = np.dot(lattice2, n)
 
     # Sets the points of the parallelogram created by transformedL1
     p12 = [transformedL1[0][0], transformedL1[0][1]]
@@ -279,7 +286,8 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
 
     # STEP 2
     # Calculates the integer ratio of areas
-    nVals = rationalizeRatio(ratio, maxN, maxErr)
+    # TO FIX: 
+    nVals = returnRatio(ratio, maxN, maxErr)
 
     # STEP 3
     # Calculate the possible M matrices
@@ -339,52 +347,67 @@ lattGaAs_110_110 = [[7.995, 0], [0, 11.31]]
 lattMoS2 = [[3.196, 0], [-3.196 * 1/2, 3.196 * np.sqrt(3) / 2]]
 lattGraphene = [[2.4, 0], [-1.2, 2.078460969]]
 
+lattMoS2_POS = [[ 3.19622328, 0], [-1.59811164, 2.76800985]]
+lattGraphene_POS = [[ 2.46495455, 0], [-1.23247777, 2.13471357]]
+
+
 lattSnSe2 = [[3.86639999, 0], [-1.93319999, 3.34840073]]
 lattWSe2 = [[3.33061865, 0], [-1.66530983, 2.88440009]]
 lattZrS2 = [[3.69092, 0], [-1.84546, 3.19643]]
 
-print("lattCdTe_100_012 vs lattGaAs_100_015: ")
-print(latticeTransformations(lattCdTe_100_012,
-    lattGaAs_100_015, maxN, maxErr))
-print()
+# print("Testing 2x Lattice: " + str(latticeTransformations
+#   ([[1, 0], [0, 1]], [[2, 0], [0, 2]], maxN, maxErr)))
 
-print("lattCdTe_100_015 vs lattGaAs_100_035: ")
-print(latticeTransformations(lattCdTe_100_015,
-    lattGaAs_100_035, maxN, maxErr))
-print()
+# print("Testing 2x Lattice: " + str(latticeTransformations
+#   ([[2, 0], [0, 2]], [[1, 0], [0, 1]], maxN, maxErr)))
 
-print("lattCdTe_111_121 vs lattGaAs_100_011: ")
-print(latticeTransformations(lattCdTe_111_121,
-    lattGaAs_100_011, maxN, maxErr))
-print()
+# print("lattCdTe_100_012 vs lattGaAs_100_015: ")
+# print(latticeTransformations(lattCdTe_100_012,
+#     lattGaAs_100_015, maxN, maxErr))
+# print()
 
-print("lattCdTe_100_011 vs lattGaAs_110_112: ")
-print(latticeTransformations(lattCdTe_100_011,
-    lattGaAs_110_112, maxN, maxErr))
-print()
+# print("lattCdTe_100_015 vs lattGaAs_100_035: ")
+# print(latticeTransformations(lattCdTe_100_015,
+#     lattGaAs_100_035, maxN, maxErr))
+# print()
 
-print("lattCdTe_100_015 vs lattGaAs_110_334: ")
-print(latticeTransformations(lattCdTe_100_015_2,
-    lattGaAs_110_334, maxN, maxErr))
-print()
+# print("lattCdTe_111_121 vs lattGaAs_100_011: ")
+# print(latticeTransformations(lattCdTe_111_121,
+#     lattGaAs_100_011, maxN, maxErr))
+# print()
 
-print("lattCdTe_110_112 vs lattGaAs_110_110: ")
-print(latticeTransformations(lattCdTe_110_112,
-    lattGaAs_110_110, maxN, maxErr))
-print()
+# print("lattCdTe_100_011 vs lattGaAs_110_112: ")
+# print(latticeTransformations(lattCdTe_100_011,
+#     lattGaAs_110_112, maxN, maxErr))
+# print()
 
-print("lattGraphene vs lattMoS2: ")
-print(latticeTransformations(lattGraphene,
-    lattMoS2, maxN, maxErr))
-print()
+# print("lattCdTe_100_015 vs lattGaAs_110_334: ")
+# print(latticeTransformations(lattCdTe_100_015_2,
+#     lattGaAs_110_334, maxN, maxErr))
+# print()
 
-print("1T-SnSe2 vs 2H-WSe2: ")
-print(latticeTransformations(lattSnSe2,
-    lattWSe2, maxN, maxErr))
-print()
+# print("lattCdTe_110_112 vs lattGaAs_110_110: ")
+# print(latticeTransformations(lattCdTe_110_112,
+#     lattGaAs_110_110, maxN, maxErr))
+# print()
 
-print("1T-ZrS2 vs 2H-WSe2: ")
-print(latticeTransformations(lattZrS2,
-    lattWSe2, maxN, maxErr))
-print()
+# print("lattGraphene vs lattMoS2: ")
+# print(latticeTransformations(lattMoS2,
+#     lattGraphene, maxN, maxErr))
+# print()
+
+# print("Poscar version: ")
+# print(latticeTransformations(lattMoS2_POS,
+#     lattGraphene_POS, maxN, maxErr))
+# print()
+
+# print("1T-SnSe2 vs 2H-WSe2: ")
+# print(latticeTransformations(lattSnSe2,
+#     lattWSe2, maxN, maxErr))
+# print()
+
+# print("1T-ZrS2 vs 2H-WSe2: ")
+# print(latticeTransformations(lattZrS2,
+#     lattWSe2, maxN, maxErr))
+# print()
 
