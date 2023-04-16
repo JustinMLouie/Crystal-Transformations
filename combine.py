@@ -7,33 +7,15 @@ from latticeMismatch import *
 struc_1 = Structure.from_file(argv[1])
 struc_2 = Structure.from_file(argv[2])
 
-
 print()
 print()
 
 l1 = struc_1.lattice.matrix
 l2 = struc_2.lattice.matrix
 
-print("l1: ")
-print(l1)
-print()
-
-
-print("l2: ")
-print(l2)
-print()
-
 # Selecting the 2D matrix of the strucs
 l1_2D = l1[:2,:2]
 l2_2D = l2[:2,:2]
-
-print("l1_2D: ")
-print(l1_2D)
-print()
-
-print("l2_2D: ")
-print(l2_2D)
-print()
 
 """
 Calculates superlattices
@@ -58,34 +40,38 @@ n_3D = [[n[0][0], n[0][1], 0],
 		 [n[1][0], n[1][1], 0], 
 		  [0, 0, 1]]
 
-print("m_3D: ")
-print(m_3D)
-
-print("n_3D: ")
-print(n_3D)
-
 struc_1.make_supercell(scaling_matrix=n_3D)
 struc_1 = RotationTransformation([0,0,1], r, False).apply_transformation(struc_1)
 
 struc_2.make_supercell(scaling_matrix=m_3D)
 
-print("supercell 1: ")
-print(struc_1.lattice)
-print()
-
-print("supercell 2: ")
-print(struc_2.lattice)
-print
+struc_1_coords = struc_1.cart_coords
+struc_2_coords = struc_2.cart_coords
 
 """
-TODO: 
+Repositions struc_2 directly above struc_1
 
-find the lowest z value of the top layer
-find the highest z value of the bottom layer
-stack them using these z values with gap of user input
-struc with bigger area is base layer
 
+Finds the highest Z in struc_1
+Finds the lowest Z in struc_2
+Moves struc_2 to be arg[v] above struc_1
 """
+
+maxZ1 = 0
+minZ2 = 1000
+
+for particle in struc_1_coords:
+	if (particle[2] >= maxZ1):
+		maxZ1 = particle[2]
+
+for particle in struc_2_coords:
+	if (particle[2] <= minZ2):
+		minZ2 = particle[2]
+
+zAdjust = maxZ1 - minZ2 + float(argv[3])
+
+for particle in struc_2_coords:
+	particle[2] += zAdjust 
 
 # struc_1.to(filename='POSCAR_{}'.format('superlattice'))
 

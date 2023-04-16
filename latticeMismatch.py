@@ -127,7 +127,7 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
     # Iterates to test each pair of m and n matrices for lowest error
     for m in mMatrices:
         for n in nMatrices:
-            for theta in np.linspace(0, 1, 1):
+            for theta in np.linspace(0, 360, 3600):
                 # Temp matrix to test counterclockwise rotation
 
                 # Represents the crystal after
@@ -160,17 +160,6 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
                     bestM = m
                     bestN = n
                     bestR = theta
-
-    # transformedL1 = np.dot(lattice1, bestM)
-    # transformedL2 = np.dot(lattice2, bestN)
-
-    # print("transformedL1")
-    # print(transformedL1)
-    # print()
-
-    # print("transformedL2")
-    # print(transformedL2)
-    # print()
 
     return [bestM, bestN, bestR, smallestErr]
 
@@ -294,23 +283,18 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
     # STEP 1
     # Calculates the area ratio between lattice 1 and lattice 2
     ratio = calculateAreaRatio(lattice1, lattice2)
-    print(ratio)
 
     # STEP 2
     # Calculates the integer ratio of areas
     # TO FIX: 
     nVals = returnRatio(ratio, maxN, maxErr)
-    print(nVals)
 
     # STEP 3
     # Calculate the possible M matrices
     # mMatrices: matrices to multiply lattice2 by
     # nMatrices: matrices to multiply lattice1 by
-    # mMatrices = calculateIndividualMVals(nVals[0])
-    # nMatrices = calculateIndividualMVals(nVals[1])
-
-    mMatrices = calculateIndividualMVals(9)
-    nMatrices = calculateIndividualMVals(16)
+    mMatrices = calculateIndividualMVals(nVals[0])
+    nMatrices = calculateIndividualMVals(nVals[1])
 
     # STEP 4
     # Determine which matrix set has the lowest error
