@@ -46,6 +46,9 @@ def rationalizeRatio(ratio, N, maxErr):
 
     Intakes number 0 < x < 1
     Maximum denominator = N
+
+    TODO: Improve rationalizeRatio algorithm
+    Have rationalizeRatio test ratios within +-5%
     """
 
     assert ratio < 1
@@ -128,7 +131,8 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
     for m in mMatrices:
         for n in nMatrices:
             for theta in np.linspace(0, 360, 3600):
-                # Temp matrix to test counterclockwise rotation
+                # TODO: Incorporate algorithm to test angles
+                # Allow it to choose any angle 0-360, figure out the optimal solution
 
                 # Represents the crystal after
                 # lattices have undergone transformations
@@ -137,6 +141,7 @@ def determineBestMatrix(lattice1, lattice2, mMatrices, nMatrices):
 
                 radianTheta = np.radians(theta)
 
+                # Temp matrix to test counterclockwise rotation
                 rotation = [[np.cos(radianTheta), -1 * np.sin(radianTheta)],
                     [np.sin(radianTheta), np.cos(radianTheta)]]
 
@@ -306,10 +311,6 @@ def latticeTransformations(lattice1, lattice2, maxN, maxErr):
     graphSuperLattices(lattice1, lattice2, acceptableMatrices, nVals)
 
     return acceptableMatrices
-
-
-# print("Testing lattice_transformations()")
-# print()
 
 maxN = 20
 maxErr = 0.01
