@@ -3,6 +3,8 @@ import numpy as np
 from pymatgen.core import Structure
 from sys import argv
 
+# Pulls POSCAR File from 2Matpedia
+
 data = [json.loads(line) for line in open('db.json.gz', 'r')]
 
 for i in range(len(data)):

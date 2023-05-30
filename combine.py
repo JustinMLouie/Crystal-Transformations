@@ -65,9 +65,6 @@ struc_1_coords[:,2] -= struc_1_coords[:,2].max()
 struc_2_coords[:,2] -= (struc_2_coords[:,2].min() - float(argv[3]))
 
 hetero_coords = np.append(struc_1_coords, struc_2_coords, axis=0)
-# print(hetero_coords.shape)
-# print(struc_1_species + struc_2_species)
-# print(hetero_coords)
 
 new_struc = Structure(new_matrix, species=struc_1_species + struc_2_species,
 	coords= hetero_coords, coords_are_cartesian=True)
